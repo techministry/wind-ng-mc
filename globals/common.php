@@ -31,7 +31,8 @@ $vars = array_merge($vars, $template_config);
 include_once(ROOT_PATH."globals/functions.php");
 
 $php_start = getmicrotime();
-if((integer)$vars['db']['version'] == 5 && (integer)phpversion() == 5) {
+// Use mysqli for PHP 5+ when db version is set to 5
+if((integer)$vars['db']['version'] == 5 && version_compare(PHP_VERSION, '5.0.0', '>=')) {
 	include_once(ROOT_PATH."globals/classes/mysqli.php");
 } else {
 	include_once(ROOT_PATH."globals/classes/mysql.php");
@@ -51,10 +52,21 @@ if ($vars['template']['version'] < $vars['info']['min_template_version']
 }
 
 $smarty = new Smarty;
-$smarty->template_dir = $vars['templates']['path'].$vars['templates']['default'].'/';
-$smarty->plugins_dir = array($vars['templates']['path'].$vars['templates']['default'].'/plugins/', 'plugins');
-$smarty->compile_dir = $vars['templates']['compiled_path'].$vars['templates']['default'].'/';
-$smarty->register_modifier('stripslashes', 'stripslashes');
+
+// Smarty 3.x/4.x compatibility
+if (method_exists($smarty, 'setTemplateDir')) {
+	// Smarty 3.x/4.x
+	$smarty->setTemplateDir($vars['templates']['path'].$vars['templates']['default'].'/');
+	$smarty->addPluginsDir($vars['templates']['path'].$vars['templates']['default'].'/plugins/');
+	$smarty->setCompileDir($vars['templates']['compiled_path'].$vars['templates']['default'].'/');
+	$smarty->registerPlugin('modifier', 'stripslashes', 'stripslashes');
+} else {
+	// Smarty 2.x (legacy)
+	$smarty->template_dir = $vars['templates']['path'].$vars['templates']['default'].'/';
+	$smarty->plugins_dir = array($vars['templates']['path'].$vars['templates']['default'].'/plugins/', 'plugins');
+	$smarty->compile_dir = $vars['templates']['compiled_path'].$vars['templates']['default'].'/';
+	$smarty->register_modifier('stripslashes', 'stripslashes');
+}
 reset_smarty();
 
 $construct = new construct;

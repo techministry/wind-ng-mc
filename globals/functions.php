@@ -175,12 +175,25 @@ function template($assign_array, $file) {
 
 function reset_smarty() {
 	global $smarty, $lang;
-	$smarty->clear_all_assign();
-	$smarty->assign_by_ref('lang', $lang);
-	$smarty->assign('tpl_dir', $smarty->template_dir);
-	$smarty->assign('img_dir', $smarty->template_dir."images/");
-	$smarty->assign('css_dir', $smarty->template_dir."css/");
-	$smarty->assign('js_dir', $smarty->template_dir."scripts/javascripts/");
+	$smarty->clearAllAssign();
+	
+	// Smarty 3.x/4.x uses assign() instead of assign_by_ref()
+	$smarty->assign('lang', $lang);
+	
+	// Get template directory - compatible with both Smarty 2.x and 3.x/4.x
+	if (method_exists($smarty, 'getTemplateDir')) {
+		// Smarty 3.x/4.x
+		$tpl_dirs = $smarty->getTemplateDir();
+		$tpl_dir = is_array($tpl_dirs) ? $tpl_dirs[0] : $tpl_dirs;
+	} else {
+		// Smarty 2.x
+		$tpl_dir = $smarty->template_dir;
+	}
+	
+	$smarty->assign('tpl_dir', $tpl_dir);
+	$smarty->assign('img_dir', $tpl_dir."images/");
+	$smarty->assign('css_dir', $tpl_dir."css/");
+	$smarty->assign('js_dir', $tpl_dir."scripts/javascripts/");
 }
 
 function delfile($str) 
