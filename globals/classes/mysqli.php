@@ -86,7 +86,7 @@ class database {
 		return $this->query_data("SHOW FIELDS FROM `$table`");
 	}
 
-	function get($select="*", $from, $where="", $group_by="", $order_by="", $limit="") {
+	function get($select, $from, $where="", $group_by="", $order_by="", $limit="") {
 		return $this->query_data("SELECT $select FROM $from".($where==""?"":" WHERE $where").($group_by==""?"":" GROUP BY $group_by").($order_by==""?"":" ORDER BY $order_by").($limit==""?"":" LIMIT $limit"));
 	}
 	
@@ -190,7 +190,7 @@ class database {
 		return $res;
 	}
 
-	function cnt($select="*", $table, $where="", $group_by="", $order_by="", $limit="") {
+	function cnt($select, $table, $where="", $group_by="", $order_by="", $limit="") {
 		if ($select == '') $select = '*';
 		$query = "SELECT $select FROM $table".($where==""?"":" WHERE $where").($group_by==""?"":" GROUP BY $group_by").($order_by==""?"":" ORDER BY $order_by").($limit==""?"":" LIMIT $limit");
 		$q = $this->query($query);
