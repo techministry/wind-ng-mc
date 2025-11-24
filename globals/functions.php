@@ -216,7 +216,7 @@ function reverse_zone_from_ip($ip) {
 
 function is8bit($str) {
 	for($i=0; $i <= strlen($str); $i++)
-		if(ord($str{$i}) >> 7)   
+		if(ord($str[$i]) >> 7)   
 			return TRUE;
 	return FALSE;
 }

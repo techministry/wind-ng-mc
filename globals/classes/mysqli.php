@@ -73,7 +73,7 @@ class database {
 		}
 		$i = 0;
 		while ($ret = mysqli_fetch_assoc($result)) {
-			while (list ($key, $value) = each ($ret)) {
+			foreach ($ret as $key => $value) {
 				$res[$i][$key] = $value;
 			}
 			$i++;
@@ -105,7 +105,7 @@ class database {
 				}
 			}
 		}
-		while (list ($key, $value) = each ($data)) {
+		foreach ($data as $key => $value) {
 			$key_t = explode(".", $key);
 			$key_t = $key_t[count($key_t)-1];
 			if ($value === '' && $nulls[$key_t] != 'YES') {
@@ -141,7 +141,7 @@ class database {
 			$nulls[$db_fields[$i]['Field']] = $db_fields[$i]['Null'];
 			$nulls['`'.$db_fields[$i]['Field'].'`'] = $db_fields[$i]['Null'];
 		}
-		while (list ($key, $value) = each ($data)) {
+		foreach ($data as $key => $value) {
 			$key_t = explode(".", $key);
 			$key_t = $key_t[count($key_t)-1];
 			if ($value === '' && $nulls[$key_t] != 'YES') {
