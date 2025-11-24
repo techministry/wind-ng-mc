@@ -24,50 +24,74 @@ var marker;
 var marker_point;
 
 function gmap_onload() {
-	if (GBrowserIsCompatible()) {
-		{/literal}
-		{foreach from=$maps_available item=map_enabled key=map_name}
-			{if $map_enabled===true}
-				{if $map_types != null}
-					{assign var=map_types value="`$map_types`,"}
-				{/if}
-				{assign var=map_types value="`$map_types` G_`$map_name`_MAP"}
-			{/if}
-		{/foreach}
-		{literal}
-		var map_types = [{/literal}{$map_types|upper}{literal}];
-		map = new GMap2(document.getElementById("map"));
-		if(map_types.length > 1)
-			map.addControl(new GMapTypeControl());
-		map.addControl(new GLargeMapControl());
-		if (window.opener.document.{/literal}{$object_lat}{literal}.value != '' && window.opener.document.{/literal}{$object_lon}{literal}.value != '') {
-			var center = new GLatLng(window.opener.document.{/literal}{$object_lat}{literal}.value, window.opener.document.{/literal}{$object_lon}{literal}.value);
-			var zoom = 16;
-			marker = new GMarker(center);
-			marker_point = center;
-		} else {
-			var center = new GLatLng({/literal}{$center_latitude}{literal}, {/literal}{$center_longitude}{literal});
-			var bound_sw = new GLatLng({/literal}{$min_latitude|default:$center_latitude}{literal},{/literal}{$min_longitude|default:$center_longitude}{literal});
-			var bound_ne = new GLatLng({/literal}{$max_latitude|default:$center_latitude}{literal},{/literal}{$max_longitude|default:$center_longitude}{literal});
-			var bounds = new GLatLngBounds(bound_sw, bound_ne);
-			var zoom = map.getBoundsZoomLevel(bounds);
-
-		}
-		map.setCenter(center, zoom, G_{/literal}{$maps_available.default|upper}{literal}_MAP);
-		GEvent.addListener(map, 'click', function(overlay, point) {
-			if (overlay) {
-				map.removeOverlay(overlay);
-			} else if (point) {
-				if (marker) map.removeOverlay(marker);
-				marker = new GMarker(point);
-				marker_point = point;
-				var html = '<div style="padding-right: 15px; white-space: nowrap; text-align:left; font-size:10px;">{/literal}{$lang.db.nodes__latitude}{literal}: ' + (Math.round(marker_point.y * 1000000)/1000000) + '<br />' + '{/literal}{$lang.db.nodes__longitude}{literal}: ' + (Math.round(marker_point.x * 1000000)/1000000) + '<br /><br />' + '<a href="" onclick="window.opener.pickup_value(window.opener.document.{/literal}{$object_lat|escape:"quotes"}{literal}, Math.round(marker_point.y * 1000000) / 1000000); window.opener.pickup_value(window.opener.document.{/literal}{$object_lon|escape:"quotes"}{literal}, Math.round(marker_point.x * 1000000)/1000000); window.close(); return false;">{/literal}{$lang.select_the_coordinates}{literal}</a></div>';
-				map.addOverlay(marker);
-				marker.openInfoWindowHtml(html);
-		}
-		});
-		if (marker) map.addOverlay(marker);
+	// Initialize Leaflet map
+	map = L.map('map', {
+		zoomControl: true
+	});
+	
+	// Add tile layers
+	var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; OpenStreetMap contributors'
+	});
+	
+	var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+		maxZoom: 19,
+		attribution: '&copy; Esri'
+	});
+	
+	// Add default layer
+	osmLayer.addTo(map);
+	
+	// Add layer control
+	var baseMaps = {
+		"OpenStreetMap": osmLayer,
+		"Satellite": satelliteLayer
+	};
+	L.control.layers(baseMaps).addTo(map);
+	
+	// Check if coordinates are already set in opener window
+	if (window.opener.document.{/literal}{$object_lat}{literal}.value != '' && window.opener.document.{/literal}{$object_lon}{literal}.value != '') {
+		var center = [
+			window.opener.document.{/literal}{$object_lat}{literal}.value,
+			window.opener.document.{/literal}{$object_lon}{literal}.value
+		];
+		var zoom = 16;
+		marker = L.marker(center).addTo(map);
+		marker_point = L.latLng(center);
+		map.setView(center, zoom);
+	} else {
+		// Use default center and fit to bounds
+		var center = [{/literal}{$center_latitude}{literal}, {/literal}{$center_longitude}{literal}];
+		var bound_sw = [{/literal}{$min_latitude|default:$center_latitude}{literal}, {/literal}{$min_longitude|default:$center_longitude}{literal}];
+		var bound_ne = [{/literal}{$max_latitude|default:$center_latitude}{literal}, {/literal}{$max_longitude|default:$center_longitude}{literal}];
+		var bounds = L.latLngBounds(bound_sw, bound_ne);
+		map.fitBounds(bounds);
 	}
+	
+	// Add click event to place marker
+	map.on('click', function(e) {
+		// Remove existing marker if any
+		if (marker) {
+			map.removeLayer(marker);
+		}
+		
+		// Create new marker at clicked position
+		marker = L.marker(e.latlng).addTo(map);
+		marker_point = e.latlng;
+		
+		// Create popup with coordinates and selection link
+		var lat = Math.round(marker_point.lat * 1000000) / 1000000;
+		var lng = Math.round(marker_point.lng * 1000000) / 1000000;
+		var html = '<div style="padding-right: 15px; white-space: nowrap; text-align:left; font-size:10px;">' +
+			'{/literal}{$lang.db.nodes__latitude}{literal}: ' + lat + '<br />' +
+			'{/literal}{$lang.db.nodes__longitude}{literal}: ' + lng + '<br /><br />' +
+			'<a href="" onclick="window.opener.pickup_value(window.opener.document.{/literal}{$object_lat|escape:"quotes"}{literal}, ' + lat + '); ' +
+			'window.opener.pickup_value(window.opener.document.{/literal}{$object_lon|escape:"quotes"}{literal}, ' + lng + '); ' +
+			'window.close(); return false;">{/literal}{$lang.select_the_coordinates}{literal}</a></div>';
+		
+		marker.bindPopup(html).openPopup();
+	});
 }
 
 {/literal}

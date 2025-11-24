@@ -352,21 +352,33 @@ function is_ip($ip, $full_ip=TRUE) {
 
 function include_gmap($javascript) {
 	global $main, $vars;
-	$dirname = dirname($_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF']);
-	$gmap_key = isset($vars['gmap']['keys'][$dirname])?$vars['gmap']['keys'][$dirname]:null;
-	if ($gmap_key == '') $gmap_key = isset($vars['gmap']['keys'][$dirname."/"])?$gmap_key = $vars['gmap']['keys'][$dirname."/"]:null;
-	if ($gmap_key == '') $gmap_key = isset($vars['gmap']['keys']["http://".$dirname])?$vars['gmap']['keys']["http://".$dirname]:null;
-	if ($gmap_key == '') $gmap_key = isset($vars['gmap']['keys']["http://".$dirname."/"])?$vars['gmap']['keys']["http://".$dirname."/"]:null;
-	if ($gmap_key == '') return FALSE;
-
-	$main->html->head->add_script("text/javascript", "http://".$vars['gmap']['server']."/maps?file=api&v=".$vars['gmap']['api']."&key=".$gmap_key);
+	
+	// Load Leaflet CSS
+	$main->html->head->add_link(array(
+		'rel' => 'stylesheet',
+		'href' => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+		'integrity' => 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
+		'crossorigin' => ''
+	));
+	
+	// Load Leaflet.markercluster CSS
+	$main->html->head->add_link(array(
+		'rel' => 'stylesheet',
+		'href' => 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css'
+	));
+	$main->html->head->add_link(array(
+		'rel' => 'stylesheet',
+		'href' => 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css'
+	));
+	
+	// Load Leaflet JS
+	$main->html->head->add_script("text/javascript", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=", "");
+	
+	// Load Leaflet.markercluster JS
+	$main->html->head->add_script("text/javascript", "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js");
+	
+	// Load custom map JavaScript
 	$main->html->head->add_script("text/javascript", $javascript);
-	$main->html->head->add_extra(
-		'<style type="text/css">
-			v\:* {
-  			behavior:url(#default#VML);
-			}
-		</style>');
 	
 	$main->html->body->tags['onload'] = "gmap_onload()";	
 	return TRUE;

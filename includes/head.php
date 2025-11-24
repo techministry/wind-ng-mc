@@ -36,9 +36,17 @@ class head {
 		array_push($this->tpl['base'], array('href' => $href, 'target' => $target));
 	}
 	
-	function add_link($rel, $type, $href) {
+	function add_link($rel, $type="", $href="", $integrity="", $crossorigin="") {
 		if (!isset($this->tpl['link'])) $this->tpl['link'] = array();
-		array_push($this->tpl['link'], array('rel' => $rel, 'type' => $type, 'href' => $href));
+		// Support both old style (3 params) and new style (array)
+		if (is_array($rel)) {
+			array_push($this->tpl['link'], $rel);
+		} else {
+			$link = array('rel' => $rel, 'type' => $type, 'href' => $href);
+			if ($integrity != '') $link['integrity'] = $integrity;
+			if ($crossorigin != '') $link['crossorigin'] = $crossorigin;
+			array_push($this->tpl['link'], $link);
+		}
 	}
 	
 	function add_meta($content, $name="", $http_equiv="", $scheme="") {
@@ -46,9 +54,12 @@ class head {
 		array_push($this->tpl['meta'], array('http-equiv' => $http_equiv, 'content' => $content, 'name' => $name, 'scheme' => $scheme));
 	}
 	
-	function add_script($type,$src) {
+	function add_script($type,$src="", $integrity="", $crossorigin="") {
 		if (!isset($this->tpl['script'])) $this->tpl['script'] = array();
-		array_push($this->tpl['script'], array('type' => $type, 'src' => $src));
+		$script = array('type' => $type, 'src' => $src);
+		if ($integrity != '') $script['integrity'] = $integrity;
+		if ($crossorigin != '') $script['crossorigin'] = $crossorigin;
+		array_push($this->tpl['script'], $script);
 	}
 	
 	function output() {
