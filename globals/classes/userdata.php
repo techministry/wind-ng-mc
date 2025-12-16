@@ -23,8 +23,8 @@ class userdata {
 	
 	var $logged=FALSE;
 	var $user='';
-	var $info;
-	var $privileges;
+	var $info = array();
+	var $privileges = array();
 	
 	#CONFIG
 	var $users_table = "users";
@@ -35,7 +35,7 @@ class userdata {
 	var $last_session_key = "last_session";
 	var $last_visit_key = "last_visit";
 	
-	function userdata() {
+	function __construct() {
 		session_start();
 		if (isset($_SESSION['userdata'][$this->primary_key])) {
 			$this->logged = TRUE;

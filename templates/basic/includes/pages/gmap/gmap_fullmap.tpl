@@ -18,9 +18,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-<table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%; height: 100%">
+<style>
+#map { min-height: calc(100vh - 150px); }
+</style>
+<table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%;">
 {if $gmap_key_ok}
-<div id="map" style="width: 100%; height: 100%"></div>
+<div id="map" style="width: 100%; height: calc(100vh - 150px);"></div>
 {else}
 {$lang.message.error.gmap_key_failed.body|wordwrap:40|nl2br}
 {/if}

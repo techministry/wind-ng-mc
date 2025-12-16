@@ -25,8 +25,13 @@ class form {
 	var $info=array();
 	var $data=array();
 	
-	function form($info="") {
+	function __construct($info="") {
 		if (is_array($info)) $this->info = $info;
+	}
+	
+	// PHP 4-style constructor for backward compatibility
+	function form($info="") {
+		$this->__construct($info);
 	}
 	
 	function db_data($db_info) {
@@ -122,12 +127,17 @@ class form {
 	
 	// set all values in the search form
 	function db_data_search() {
-		$sc = unserialize(stripslashes(get($this->info['FORM_NAME'].'_search')));
+		$search_str = get((isset($this->info['FORM_NAME']) ? $this->info['FORM_NAME'].'_search' : ''));
+		$sc = array();
+		if ($search_str) {
+			$sc = @unserialize(stripslashes($search_str));
+			if (!is_array($sc)) $sc = array();
+		}
 		for ($i=0;$i<count($this->data);$i++) {
 			if (isset($this->data[$i])) {
 				$this->data[$i]['value'] = (isset($_POST[$this->data[$i]['fullField']]) ? $_POST[$this->data[$i]['fullField']] : (isset($sc[$this->data[$i]['fullField']])?$sc[$this->data[$i]['fullField']]:null));
 				if (isset($this->data[$i]['Compare'])) {
-					$this->data[$i]['Compare_value'] = (isset($_POST[$this->data[$i]['fullField'].'_compare']) ? $_POST[$this->data[$i]['fullField'].'_compare'] : $sc[$this->data[$i]['fullField'].'_compare']);
+					$this->data[$i]['Compare_value'] = (isset($_POST[$this->data[$i]['fullField'].'_compare']) ? $_POST[$this->data[$i]['fullField'].'_compare'] : (isset($sc[$this->data[$i]['fullField'].'_compare'])?$sc[$this->data[$i]['fullField'].'_compare']:''));
 				}
 				$this->data[$i]['Null'] = 'YES';
 			}
@@ -205,8 +215,7 @@ class form {
 					}
 				}
 			}
-			reset($pdata);
-			while (list($key, $value) = each($pdata)) {
+			foreach ($pdata as $key => $value) {
 				$key = explode(".", $key);
 				if ($ckey == $key[0] || (!isset($key[1]) || $key[1] == '')) {
 					$data[((!isset($key[1]) || $key[1]=='')?$key[0]:$key[1])] = $value;
@@ -241,14 +250,13 @@ class form {
 					}
 				}
 			}
-			reset($pdata);
-			while (list($key, $value) = each($pdata)) {
+			foreach ($pdata as $key => $value) {
 				$key = explode(".", $key);
 				if ($ckey == $key[0] || $key[1] == '') {
 					$data[($key[1]==''?$key[0]:$key[1])] = $value;
 				}
 			}
-			while (list($key, $value) = each($data)) {
+			foreach ($data as $key => $value) {
 				if (is_array($value)) {
 					for ($i=0;$i<count($value);$i++) {
 						$data_f[$i] = $data;
@@ -269,7 +277,7 @@ class form {
 	}
 
 	function correct_datetime_data($data) {
-		while (list($key, $value) = each($data)) {
+		foreach ($data as $key => $value) {
 			if (strpos($key, "CONDATETIME_") === 0) {
 				$ckey = substr($key, 12, strrpos($key, "_") - strlen($key));
 				

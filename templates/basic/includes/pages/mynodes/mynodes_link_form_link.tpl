@@ -134,7 +134,7 @@ function type_changed() {
 			0<select class="fld-form-input" name="{$data[0].fullField}" onchange="type_changed()">
 				{if $data[0].Null == 'YES'}<option value=""></option>{/if}
 				{section loop=$data[0].Type_Enums name=e}
-				<option value="{$data[0].Type_Enums[e].value|escape}"{if $data[0].Type_Enums[e].value == $data[0].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.0.fullField value=$data[0].Type_Enums[e].output}</option>
+				<option value="{$data[0].Type_Enums[e].value|escape}"{if $data[0].Type_Enums[e].value == $data[0].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.0.fullField value=$data[0].Type_Enums[e].output}</option>
 				{/section}
 			</select>
 		</td>
@@ -144,8 +144,8 @@ function type_changed() {
 		<td class="table-form-field">
 			1<input type="hidden" name="{$data[1].fullField}" value="{$data[1].Type_Pickup.value|escape}" />
 			<input type="text" disabled="disabled" class="fld-form-input-pickup" name="{$data[1].fullField}_output" value="{$data[1].Type_Pickup.output|escape}" />
-			{include file=generic/link.tpl content="`$lang.change`" onclick="javascript: t = window.open('`$data[1].Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
-			{if $data[1].Null == 'YES'}{include file=generic/link.tpl content="`$lang.delete`" onclick="javascript: `$data[1].fullField`.value = ''; `$data[1].fullField`_output.innerText = ''; return false;"}{/if}
+			{include file="generic/link.tpl" content="`$lang.change`" onclick="javascript: t = window.open('`$data[1].Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
+			{if $data[1].Null == 'YES'}{include file="generic/link.tpl" content="`$lang.delete`" onclick="javascript: `$data[1].fullField`.value = ''; `$data[1].fullField`_output.innerText = ''; return false;"}{/if}
 		</td>	
 		</tr>	
 		<tr class="table-form-row2">
@@ -153,8 +153,8 @@ function type_changed() {
 		<td class="table-form-field">
 			2<input type="hidden" name="{$data[2].fullField}" value="{$data[2].Type_Pickup.value|escape}" />
 			<input type="text" disabled="disabled" class="fld-form-input-pickup" name="{$data[2].fullField}_output" value="{$data[2].Type_Pickup.output|escape}" />
-			{include file=generic/link.tpl content="`$lang.change`" onclick="javascript: t = window.open('`$data[2].Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
-			{if $data[2].Null == 'YES'}{include file=generic/link.tpl content="`$lang.delete`" onclick="javascript: `$data[2].fullField`.value = ''; `$data[2].fullField`_output.innerText = ''; return false;"}{/if}
+			{include file="generic/link.tpl" content="`$lang.change`" onclick="javascript: t = window.open('`$data[2].Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
+			{if $data[2].Null == 'YES'}{include file="generic/link.tpl" content="`$lang.delete`" onclick="javascript: `$data[2].fullField`.value = ''; `$data[2].fullField`_output.innerText = ''; return false;"}{/if}
 		</td>	
 		</tr>	
 		<tr class="table-form-row2"><td class="table-form-title">{$lang.db[$data.3.fullField]}{if $data[3].Null != 'YES'}*{/if}:</td>
@@ -162,7 +162,7 @@ function type_changed() {
 			3<select class="fld-form-input" name="{$data[3].fullField}">
 				{if $data[3].Null == 'YES'}<option value=""></option>{/if}
 				{section loop=$data[3].Type_Enums name=e}
-				<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
+				<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
 				{/section}
 			</select>
 		</td></tr>	
@@ -176,7 +176,7 @@ function type_changed() {
 			6<select class="fld-form-input" name="{$data[6].fullField}">
 				{if $data[6].Null == 'YES'}<option value=""></option>{/if}
 				{section loop=$data[6].Type_Enums name=e}
-				<option value="{$data[6].Type_Enums[e].value|escape}"{if $data[6].Type_Enums[e].value == $data[6].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.6.fullField value=$data[6].Type_Enums[e].output}</option>
+				<option value="{$data[6].Type_Enums[e].value|escape}"{if $data[6].Type_Enums[e].value == $data[6].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.6.fullField value=$data[6].Type_Enums[e].output}</option>
 				{/section}
 			</select>
 		</td></tr>	
@@ -189,7 +189,7 @@ function type_changed() {
 			9<select class="fld-form-input" name="{$data[9].fullField}">
 				{if $data[9].Null == 'YES'}<option value=""></option>{/if}
 				{section loop=$data[9].Type_Enums name=e}
-				<option value="{$data[9].Type_Enums[e].value|escape}"{if $data[9].Type_Enums[e].value == $data[9].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.9.fullField value=$data[9].Type_Enums[e].output}</option>
+				<option value="{$data[9].Type_Enums[e].value|escape}"{if $data[9].Type_Enums[e].value == $data[9].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.9.fullField value=$data[9].Type_Enums[e].output}</option>
 				{/section}
 			</select>
 		</td></tr>	

@@ -21,26 +21,51 @@
 
 class gmap_xml {
 	
-	function gmap_xml() {
+	function __construct() {
 		
 	}
 	
 	function output() {
 		global $db, $lang;
 		
+		// Clean output buffer and set XML headers early
+		while (ob_get_level()) {
+			ob_end_clean();
+		}
+		
+		// Suppress warnings/errors from corrupting XML output
+		error_reporting(0);
+		
+		// Determine charset
+		$charset = isset($lang['charset']) ? $lang['charset'] : 'utf-8';
+		
+		// Set headers only if not already sent
+		if (!headers_sent()) {
+			header("Expires: 0");
+			header("Content-type: text/xml; charset=" . $charset);
+		}
+		
 		$node = $db->get('latitude, longitude', 'nodes', "id = ".intval(get('node')));
-		$node = $node[0];
+		$node = isset($node[0]) ? $node[0] : array();
+		
+		// Initialize variables for PHP 8.x compatibility
+		$having = '';
+		$xml = '';
+		$where = '';
+		$nodes = array();
+		$links = array();
 		
 		if (get('node') != '') $having .= ($having!=''?' OR ':'')."id = ".intval(get('node'));
 		if (get('show_p2p') == 1) $having .= ($having!=''?' OR ':'').'total_p2p > 0';
 		if (get('show_aps') == 1) $having .= ($having!=''?' OR ':'').'total_aps > 0';
 		if (get('show_clients') == 1) $having .= ($having!=''?' OR ':'').'(total_p2p = 0 AND total_aps = 0 AND total_client_on_ap > 0)';
 		if (get('show_unlinked') == 1) $having .= ($having!=''?' OR ':'').'(total_p2p = 0 AND total_aps = 0 AND total_client_on_ap = 0)';
-		if ($having != '') $nodes = $db->get(
+		if ($having != '') {
+			$nodes = $db->get(
 			'nodes.id, nodes.latitude, nodes.longitude,users.username as node_adminowner,nodes.freeifs as node__freeifs,nodes.community_id as community_id,communities.name as community_name, nodes.name AS nodes__name, areas.name AS areas__name, COUNT(DISTINCT p2p.id) AS total_p2p, COUNT(DISTINCT aps.id) AS total_aps, COUNT(DISTINCT clients.id) AS total_clients, COUNT(DISTINCT client_ap.id) AS total_client_on_ap',
 			'nodes
 			LEFT JOIN areas ON nodes.area_id = areas.id
-			LEFT JOIN communities ON nodes.community_id = communities.id #@#
+			LEFT JOIN communities ON nodes.community_id = communities.id
 			LEFT JOIN links AS p2p_t ON nodes.id = p2p_t.node_id
 			LEFT JOIN links AS p2p ON p2p.type = "p2p" AND p2p_t.peer_node_id = p2p.node_id AND p2p.peer_node_id = p2p_t.node_id
 			LEFT JOIN links AS aps ON nodes.id = aps.node_id AND aps.type = "ap"
@@ -51,7 +76,8 @@ class gmap_xml {
 			"users.status = 'activated'",
 			'nodes.id' .
 			($having!=''?' HAVING '.$having:''));
-		$xml .= "<?xml version='1.0' encoding='".$lang['charset']."' standalone='yes'?>\r"; 
+		}
+		$xml .= "<?xml version='1.0' encoding='".$charset."' standalone='yes'?>\r"; 
 		$xml .= "<wind>\r";
 		$xml .= "<nodes>\r";
 		foreach ((array) $nodes as $key => $value) {
@@ -70,11 +96,11 @@ class gmap_xml {
 				$xml .= 'unlinked';
 			}
 			$xml .= ' id="'.$value['id'].'"';
-			$xml .= ' name="'.htmlspecialchars($value['nodes__name'], ENT_COMPAT, $lang['charset']).'"';
-			$xml .= ' area="'.htmlspecialchars($value['areas__name'], ENT_COMPAT, $lang['charset']).'"';
-			$xml .= ' community="'.$value['community_name'].'"';
-			$xml .= ' freeifs="'.$value['node__freeifs'].'"';
-			$xml .= ' adminowner="'.$value['node_adminowner'].'"';
+			$xml .= ' name="'.htmlspecialchars($value['nodes__name'] ?? '', ENT_COMPAT, $lang['charset']).'"';
+			$xml .= ' area="'.htmlspecialchars($value['areas__name'] ?? '', ENT_COMPAT, $lang['charset']).'"';
+			$xml .= ' community="'.($value['community_name'] ?? '').'"';
+			$xml .= ' freeifs="'.($value['node__freeifs'] ?? '').'"';
+			$xml .= ' adminowner="'.($value['node_adminowner'] ?? '').'"';
 			
 			if ($value['total_p2p'] != 0) $xml .= ' p2p="'.$value['total_p2p'].'"';
 			if ($value['total_aps'] != 0) $xml .= ' aps="'.$value['total_aps'].'"';
@@ -82,7 +108,7 @@ class gmap_xml {
 			if ($value['total_clients'] != 0) $xml .= ' clients="'.$value['total_clients'].'"';
 			$xml .= ' lat="'.$value['latitude'].'"';
 			$xml .= ' lon="'.$value['longitude'].'"';
-			$xml .= ' url="'.htmlspecialchars(makelink(array("page" => "nodes", "node" => $value['id']))).'"';
+			$xml .= ' url="'.makelink(array("page" => "nodes", "node" => $value['id'])).'"';
 			$xml .= " />\r";
 		}
 		$xml .= "</nodes>\r";
@@ -113,8 +139,6 @@ class gmap_xml {
 		$xml .= "</links>\r";
 		$xml .= "</wind>\r";
 		
-		header("Expires: 0");
-		header("Content-type: text/xml; charset=".$lang['charset']);
 		echo $xml;
 		exit;
 	}

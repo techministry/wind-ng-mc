@@ -28,17 +28,25 @@ class html {
 	var $head;
 	var $body;
 	
-	function html() {
-		$this->head = new head;
-		$this->body = new body;		
+	function __construct() {
+		$this->tpl = array();
+		try {
+			$this->head = new head;
+			$this->body = new body;
+		} catch (Throwable $e) {
+			error_log("HTML class error: " . $e->getMessage() . " - " . $e->getFile() . ":" . $e->getLine());
+			throw $e;  // Re-throw to see the actual error
+		}
 	}
 	
 	function output() {
+		global $vars;
 		$this->tpl['head'] = $this->head->output();
 		$this->tpl['body'] = $this->body->output();
 		$this->tpl['body_tags'] = $this->body->tags;
-		$ret = template($this->tpl, __FILE__);
-		return $ret;
+		
+		// Use Smarty template for proper HTML output with all CSS/JS includes
+		return template($this->tpl, 'html', TRUE);
 	}
 	
 }

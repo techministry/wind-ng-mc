@@ -23,7 +23,7 @@ class search_suggest_js {
 	
 	var $tpl;
 
-	function search_suggest_js() {
+	function __construct() {
 		
 	}
 	

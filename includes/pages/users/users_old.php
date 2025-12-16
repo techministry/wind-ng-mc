@@ -26,7 +26,7 @@ class users {
 	var $tpl;
 	var $restore;
 	
-	function users() {
+	function __construct() {
 		if (get('action') == 'restore') {
 			$this->restore = new users_restore;
 		}
@@ -176,3 +176,4 @@ class users {
 }
 
 ?>
+

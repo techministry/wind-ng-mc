@@ -206,10 +206,37 @@ function gmap_refresh() {
 		(ch_unlinked.checked == true && unlinked.length == 0?"&show_unlinked=1":"") +
 		(ch_p2p.checked == true && links_p2p.length == 0?"&show_links_p2p=1":"") +
 		(ch_aps.checked == true && ch_clients.checked == true && links_client.length == 0?"&show_links_client=1":"");
+	console.log("Fetching XML from:", xml_url);
 	request.open("GET", xml_url, true);
 	request.onreadystatechange = function() {
 		if (request.readyState == 4) {
+			console.log("XML response status:", request.status);
+			console.log("XML response type:", request.getResponseHeader("Content-Type"));
 			var xmlDoc = request.responseXML;
+			
+			// Fallback: manually parse XML if responseXML is null
+			if (!xmlDoc || !xmlDoc.documentElement) {
+				console.log("Attempting manual XML parsing...");
+				try {
+					var parser = new DOMParser();
+					xmlDoc = parser.parseFromString(request.responseText, "text/xml");
+					// Check for parse errors
+					var parseError = xmlDoc.getElementsByTagName("parsererror");
+					if (parseError.length > 0) {
+						console.error("XML parse error:", parseError[0].textContent);
+						return;
+					}
+				} catch (e) {
+					console.error("Failed to parse XML:", e);
+					return;
+				}
+			}
+			
+			if (!xmlDoc || !xmlDoc.documentElement) {
+				console.error("Failed to parse XML response. Response text:", request.responseText.substring(0, 500));
+				return;
+			}
+			console.log("XML root element:", xmlDoc.documentElement.tagName);
 			selected = xmlDoc.documentElement.getElementsByTagName("selected");
 			if ((ch_p2p.checked == true || ch_aps.checked == true) && p2p_ap.length == 0) p2p_ap = xmlDoc.documentElement.getElementsByTagName("p2p-ap");
 			if (ch_aps.checked == true && aps.length == 0) aps = xmlDoc.documentElement.getElementsByTagName("ap");
@@ -218,6 +245,7 @@ function gmap_refresh() {
 			if (ch_unlinked.checked == true && unlinked.length == 0) unlinked = xmlDoc.documentElement.getElementsByTagName("unlinked");
 			if (ch_p2p.checked == true && links_p2p.length == 0) links_p2p = xmlDoc.documentElement.getElementsByTagName("link_p2p");
 			if (ch_aps.checked == true && ch_clients.checked == true && links_client.length == 0) links_client = xmlDoc.documentElement.getElementsByTagName("link_client");
+			console.log("Nodes loaded - p2p:", p2p.length, "aps:", aps.length, "clients:", clients.length, "unlinked:", unlinked.length);
 			markerClusterGroup.clearLayers();
 			markers = {};
 			for (var pid in polylines) {

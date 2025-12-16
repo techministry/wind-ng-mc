@@ -23,7 +23,7 @@ class mynodes_subnet {
 
 	var $tpl;
 	
-	function mynodes_subnet() {
+	function __construct() {
 		
 	}
 	

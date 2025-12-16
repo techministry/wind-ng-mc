@@ -23,7 +23,7 @@ class hostmaster_range {
 
 	var $tpl;
 	
-	function hostmaster_range() {
+	function __construct() {
 	 	/*global $db, $main;
 		if ($this->has_edit_access()){	return;	}  else {
 				#$main->message->'no access';//set_fromlang('error', 'generic');	

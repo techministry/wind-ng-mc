@@ -23,7 +23,7 @@ class admin_users {
 
 	var $tpl;
 	
-	function admin_users() {
+	function __construct() {
 		
 	}
 	

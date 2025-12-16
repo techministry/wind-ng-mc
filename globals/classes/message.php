@@ -30,8 +30,9 @@ class message {
 	var $template='constructors/message.tpl';
 	var $tpl;
 	
-	function message() {
-
+	function __construct() {
+		$this->show = FALSE;
+		$this->tpl = array();
 	}
 
 	function set_fromlang($type, $message, $forward="", $image="", $hide_menu="", $override=FALSE) {

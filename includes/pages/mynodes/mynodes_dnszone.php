@@ -23,7 +23,7 @@ class mynodes_dnszone {
 
 	var $tpl;
 	
-	function mynodes_dnszone() {
+	function __construct() {
 		
 	}
 	

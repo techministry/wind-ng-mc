@@ -23,7 +23,7 @@ class ranges_allocation {
 
 	var $tpl;
 	
-	function ranges_allocation() {
+	function __construct() {
 		
 	}
 	

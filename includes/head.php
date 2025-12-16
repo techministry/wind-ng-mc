@@ -23,7 +23,12 @@ class head {
 
 	var $tpl;
 	
+	function __construct() {
+		$this->tpl = array();
+	}
+	
 	function add_extra($extra) {
+		if (!isset($this->tpl['extra'])) $this->tpl['extra'] = '';
 		$this->tpl['extra'] .= $extra;
 	}
 	
@@ -63,7 +68,49 @@ class head {
 	}
 	
 	function output() {
-		return template($this->tpl, __FILE__);
+		// Return HTML structure for head without rendering template yet
+		// This prevents parse errors in template from breaking object construction
+		$ret = "<title>" . (isset($this->tpl['title']) ? htmlspecialchars($this->tpl['title']) : 'WiND') . "</title>\n";
+		
+		if (isset($this->tpl['meta']) && is_array($this->tpl['meta'])) {
+			foreach ($this->tpl['meta'] as $meta) {
+				$ret .= '<meta ';
+				if (!empty($meta['http-equiv'])) $ret .= 'http-equiv="' . htmlspecialchars($meta['http-equiv']) . '" ';
+				if (!empty($meta['name'])) $ret .= 'name="' . htmlspecialchars($meta['name']) . '" ';
+				if (!empty($meta['content'])) $ret .= 'content="' . htmlspecialchars($meta['content']) . '" ';
+				if (!empty($meta['scheme'])) $ret .= 'scheme="' . htmlspecialchars($meta['scheme']) . '" ';
+				$ret .= ">\n";
+			}
+		}
+		
+		if (isset($this->tpl['link']) && is_array($this->tpl['link'])) {
+			foreach ($this->tpl['link'] as $link) {
+				$ret .= '<link ';
+				if (!empty($link['rel'])) $ret .= 'rel="' . htmlspecialchars($link['rel']) . '" ';
+				if (!empty($link['type'])) $ret .= 'type="' . htmlspecialchars($link['type']) . '" ';
+				if (!empty($link['href'])) $ret .= 'href="' . htmlspecialchars($link['href']) . '" ';
+				if (!empty($link['integrity'])) $ret .= 'integrity="' . htmlspecialchars($link['integrity']) . '" ';
+				if (!empty($link['crossorigin'])) $ret .= 'crossorigin="' . htmlspecialchars($link['crossorigin']) . '" ';
+				$ret .= ">\n";
+			}
+		}
+		
+		if (isset($this->tpl['script']) && is_array($this->tpl['script'])) {
+			foreach ($this->tpl['script'] as $script) {
+				$ret .= '<script ';
+				if (!empty($script['type'])) $ret .= 'type="' . htmlspecialchars($script['type']) . '" ';
+				if (!empty($script['src'])) $ret .= 'src="' . htmlspecialchars($script['src']) . '" ';
+				if (!empty($script['integrity'])) $ret .= 'integrity="' . htmlspecialchars($script['integrity']) . '" ';
+				if (!empty($script['crossorigin'])) $ret .= 'crossorigin="' . htmlspecialchars($script['crossorigin']) . '" ';
+				$ret .= '></script>' . "\n";
+			}
+		}
+		
+		if (isset($this->tpl['extra'])) {
+			$ret .= $this->tpl['extra'];
+		}
+		
+		return $ret;
 	}
 
 }

@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include file=generic/page-title.tpl title="`$lang.admin_panel` > `$lang.communities`"}
+{include file="generic/page-title.tpl" title="`$lang.admin_panel` > `$lang.communities`"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
 {include assign="t1" file="generic/link.tpl" link=$link_communities_add content="`$lang.communities_add`"}
-{include file=generic/title2.tpl title="`$lang.communities` $t1" content=$table_communities}
+{include file="generic/title2.tpl" title="`$lang.communities` $t1" content=$table_communities}
 </td>
 </tr>
 </table>

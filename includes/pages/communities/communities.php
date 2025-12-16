@@ -23,7 +23,7 @@ class communities {
 
 	var $tpl;
 	
-	function communities() {
+	function __construct() {
 		
 	}
 	

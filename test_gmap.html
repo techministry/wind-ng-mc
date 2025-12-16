@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>WiND - Wireless Nodes Database</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<link href="templates/basic/css/styles.css" rel="stylesheet" type="text/css" />
+<title>WiND - Wireless Nodes Database</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" >
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" >
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" >
+<script type="text/javascript" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" ></script>
+<script type="text/javascript" src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" ></script>
+<script type="text/javascript" src="?page=gmap&amp;subpage=js&amp;node=10567" ></script>
+</head>
+<body onload="gmap_onload()">
+<div id="header"><header>
+<h1>WiND - Wireless Nodes Database</h1>
+</header>
+</div>
+<div id="center"><style>
+#map { min-height: calc(100vh - 150px); }
+</style>
+<table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%;">
+<div id="map" style="width: 100%; height: calc(100vh - 150px);"></div>
+</td></tr><tr><td style="font-size:12px;" align="center">
+<input type="checkbox" name="p2p" checked="checked" onclick="gmap_refresh();" /><img src="templates/basic/images//gmap/mm_20_orange.png" alt="Backbone" width="12" height="20" />Backbone
+<input type="checkbox" name="aps" checked="checked" onclick="gmap_refresh();" /><img src="templates/basic/images//gmap/mm_20_green.png" alt="Access Points" width="12" height="20" />Access Points
+<input type="checkbox" name="hs" checked="checked" onclick="gmap_refresh();" /><img src="templates/basic/images//gmap/mm_20_green.png" alt="" width="12" height="20" />
+<input type="checkbox" name="clients" checked="checked" onclick="gmap_refresh();" /><img src="templates/basic/images//gmap/mm_20_blue.png" alt="Clients" width="12" height="20" />Clients
+<input type="checkbox" name="unlinked" onclick="gmap_refresh();" /><img src="templates/basic/images//gmap/mm_20_red.png" alt="Not linked" width="12" height="20" />Not linked
+</td></tr>
+</table></div>
+<div id="footer"><footer>
+<p>Execution time: 0.223s | DB time: 0.000s</p>
+</footer>
+</div>
+</body>
+</html>

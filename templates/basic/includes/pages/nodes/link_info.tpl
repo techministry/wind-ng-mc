@@ -71,7 +71,7 @@
 </tr>
 </table>
 		</td>
-		<td class="table-node-link-info" width="33%">{include file=generic/plot.tpl}</td>
+		<td class="table-node-link-info" width="33%">{include file="generic/plot.tpl"}</td>
 		<td class="table-node-link-info" width="33%" height="100%">
 		{include file="generic/title4.tpl" title="`$lang.db.links__info`" content="`$data[rowl].links__info`"|escape|nl2br}
 		</td>

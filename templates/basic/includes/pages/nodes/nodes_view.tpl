@@ -19,7 +19,7 @@
  *
  *}
  <!-- start nodes_view_tpl -->
-{include file=generic/page-title.tpl title="`$lang.node` `$node.name` (#`$node.id`)"|escape right="$help"}
+{include file="generic/page-title.tpl" title="`$lang.node` `$node.name` (#`$node.id`)"|escape right="$help"}
 
 <div class="wavetabs" style="position:relative">
 	<ul class="tabs">
@@ -53,11 +53,11 @@
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 	<td class="table-page-split">
-		{include file=generic/title2.tpl title="`$lang.node`" content=$t}
+		{include file="generic/title2.tpl" title="`$lang.node`" content=$t}
 
-		{include assign=t1 file="includes/pages/nodes/node_info.tpl"}
+		{include assign="t1" file="includes/pages/nodes/node_info.tpl"}
 
-		{if $edit_node}{include assign=ed file="generic/link.tpl" content="`$lang.edit_node`" link=$edit_node}{/if}
+		{if $edit_node}{include assign="ed" file="generic/link.tpl" content="`$lang.edit_node`" link=$edit_node}{/if}
 		{include file="generic/title3.tpl" title="`$lang.node_info` $ed" content="$t1"}
 		{include file="generic/title4.tpl" title="`$lang.db.nodes__info`" content="`$node.info`"|escape|nl2br}
 		{if $logged==TRUE}
@@ -85,15 +85,15 @@
 		</table>		
 		{/if}
 		<br />
-		<div align="center">{include file=generic/link.tpl content="`$lang.node_plot_link`" onclick="javascript: t = window.open('$link_plot_link', 'popup_plot_link', 'width=600,height=420,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}</div>
+		<div align="center">{include file="generic/link.tpl" content="`$lang.node_plot_link`" onclick="javascript: t = window.open('$link_plot_link', 'popup_plot_link', 'width=600,height=420,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}</div>
 	</td>
 	<td class="table-page-split" width="100%">
 	{if $gmap_key_ok!=="nomap"}
 		<Br />
 		<table bgcolor="#DBE0D7" cellpadding="0" cellspacing="2" width="100%">
 			<tr>
-				<td align="left" nowrap="nowrap">{include file=generic/link.tpl link=$link_gearth content="Google earth"}</td>
-				<td align="right" nowrap="nowrap">{include file=generic/link.tpl link=$link_fullmap content="`$lang.new_window`" target="_blank"}</td>
+				<td align="left" nowrap="nowrap">{include file="generic/link.tpl" link=$link_gearth content="Google earth"}</td>
+				<td align="right" nowrap="nowrap">{include file="generic/link.tpl" link=$link_fullmap content="`$lang.new_window`" target="_blank"}</td>
 			</tr>
 			<tr>
 				<td style="font-size:12px; text-align:center; width: 100%; height: 500px" colspan="2">
@@ -130,7 +130,7 @@
 	{assign var=aps value="`$aps``$ap`"}
 {/foreach}
 {if $logged==TRUE}
-{include file=generic/title2.tpl title="`$lang.links`" content="`$table_links_p2p``$aps`"}
+{include file="generic/title2.tpl" title="`$lang.links`" content="`$table_links_p2p``$aps`"}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>
@@ -143,7 +143,7 @@
 <tr>
 <td colspan="2" class="table-page-pad">
 {if $logged==TRUE}
-{include file=generic/title2.tpl title="`$lang.mynetwork`" content=$table_ipaddr_subnets}
+{include file="generic/title2.tpl" title="`$lang.mynetwork`" content=$table_ipaddr_subnets}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>
@@ -155,7 +155,7 @@
 <tr>
 <td colspan="2" class="table-page-pad">
 {if $logged==TRUE}
-{include file=generic/title2.tpl title="`$lang.services`" content=$table_services}
+{include file="generic/title2.tpl" title="`$lang.services`" content=$table_services}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>
@@ -167,8 +167,8 @@
 <tr>
 <td colspan="2" class="table-page-pad">
 {if $logged==TRUE}
-{include assign=t file=includes/pages/nodes/myview.tpl}
-{include file=generic/title2.tpl title="`$lang.myview`" content=$t}
+{include assign="t" file="includes/pages/nodes/myview.tpl"}
+{include file="generic/title2.tpl" title="`$lang.myview`" content=$t}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>
@@ -181,7 +181,7 @@
 <tr>
 <td colspan="2" class="table-page-pad">
 {if $logged==TRUE}
-{include file=generic/title2.tpl title="Logs" content=$t}
+{include file="generic/title2.tpl" title="Logs" content=$t}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>

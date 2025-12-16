@@ -81,11 +81,11 @@ function sendmail_changed() {{/literal}
 		<select class="fld-form-input" name="{$data.2.fullField}[]" size="5" multiple="multiple">
 			{section loop=$data.2.Type_Pickup name=e}
 			{assign var="value" value=$data.2.Type_Pickup[e].value}
-			<option value="{$data.2.Type_Pickup[e].value|escape}" selected="selected">{include file=constructors/form_enum.tpl fullField=$fullField value=$data.2.Type_Pickup[e].output}</option>
+			<option value="{$data.2.Type_Pickup[e].value|escape}" selected="selected">{include file="constructors/form_enum.tpl" fullField=$fullField value=$data.2.Type_Pickup[e].output}</option>
 			{/section}
 		</select>
-		{include file=generic/link.tpl content="`$lang.add`" onclick="javascript: t = window.open('`$data.2.Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
-		{include file=generic/link.tpl content="`$lang.remove`" onclick="javascript: remove_selected(window.document.`$extra_data.FORM_NAME`.elements['`$data.2.fullField`[]']); return false;"}
+		{include file="generic/link.tpl" content="`$lang.add`" onclick="javascript: t = window.open('`$data.2.Pickup_url`', 'popup_pickup', 'width=700,height=600,toolbar=0,resizable=1,scrollbars=1'); t.focus(); return false;"}
+		{include file="generic/link.tpl" content="`$lang.remove`" onclick="javascript: remove_selected(window.document.`$extra_data.FORM_NAME`.elements['`$data.2.fullField`[]']); return false;"}
 	</td>	
 	</tr>
 		
@@ -93,7 +93,7 @@ function sendmail_changed() {{/literal}
 	<td class="table-form-field">
 		<select class="fld-form-input" name="{$data[3].fullField}" onchange="status_changed()">
 			{section loop=$data[3].Type_Enums name=e}
-			<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
+			<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
 			{/section}
 		</select>
 	</td></tr>	

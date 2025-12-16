@@ -23,7 +23,7 @@ class users_restore {
 
 	var $tpl;
 	
-	function users_restore() {
+	function __construct() {
 		
 	}
 

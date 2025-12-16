@@ -23,7 +23,7 @@ class pickup_nodes {
 
 	var $tpl;
 	
-	function pickup_nodes() {
+	function __construct() {
 		
 	}
 	

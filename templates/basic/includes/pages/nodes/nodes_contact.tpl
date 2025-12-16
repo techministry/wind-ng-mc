@@ -18,12 +18,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include assign=help file=generic/help.tpl help=node_contact}
-{include file=generic/page-title.tpl title="`$lang.contact`" right="$help"}
+{include assign="help" file="generic/help.tpl" help="node_contact"}
+{include file="generic/page-title.tpl" title="`$lang.contact`" right="$help"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.contact_node` $node_name (#$node_id)"|escape content=$form_contact}
+{include file="generic/title1.tpl" title="`$lang.contact_node` $node_name (#$node_id)"|escape content=$form_contact}
 </td>
 </tr>
 </table>

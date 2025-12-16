@@ -20,16 +20,19 @@
  */
 
 include_once(ROOT_PATH.'globals/classes/geocalc.php');
+global $geocalc;
 $geocalc = new geocalc();
 
 include_once(ROOT_PATH.'globals/classes/srtm.php');
-$srtm = new srtm($vars['srtm']['path']);
+global $vars, $srtm;
+$srtm_path = isset($vars['srtm']['path']) ? $vars['srtm']['path'] : '';
+$srtm = $srtm_path ? new srtm($srtm_path) : null;
 
 class nodes_view {
 
 	var $tpl;
 	
-	function nodes_view() {
+	function __construct() {
 		
 	}
 
@@ -38,13 +41,19 @@ class nodes_view {
 		$a_node_i = $db->get('latitude, longitude, elevation', 'nodes', "id = '".$a_node."'");
 		$b_node_i = $db->get('latitude, longitude, elevation', 'nodes', "id = '".$b_node."'");
 		
+		// Ensure we have valid data
+		if (empty($a_node_i) || empty($b_node_i)) {
+			return 0;
+		}
+		
 		$lat1 = $a_node_i[0]['latitude'];
 		$lon1 = $a_node_i[0]['longitude'];
 		$lat2 = $b_node_i[0]['latitude'];
 		$lon2 = $b_node_i[0]['longitude'];
 
-		$a_node_el = str_replace(",", ".", $srtm->get_elevation($lat1, $lon1, FALSE));
-		$b_node_el = str_replace(",", ".", $srtm->get_elevation($lat2, $lon2, FALSE));
+		// Use SRTM elevation data if available, otherwise skip elevation calculation
+		$a_node_el = $srtm ? str_replace(",", ".", $srtm->get_elevation($lat1, $lon1, FALSE)) : FALSE;
+		$b_node_el = $srtm ? str_replace(",", ".", $srtm->get_elevation($lat2, $lon2, FALSE)) : FALSE;
 		
 		$dist   = $geocalc->GCDistance($lat1, $lon1, $lat2, $lon2);
 		
@@ -182,7 +191,7 @@ class nodes_view {
 			}
 			#@#
 		}
-		$table_links->db_data_translate('links__status', 'links__type',links__security);
+		$table_links->db_data_translate('links__status', 'links__type', 'links__security');
 		$table_links->db_data_hide('peer_node_name', 'links__info', 'links__peer_node_id', 'l1_status', 'l2_status', 'l1_security', 'l2_security');
 		return $table_links;
 	}
@@ -370,3 +379,4 @@ class nodes_view {
 }
 
 ?>
+

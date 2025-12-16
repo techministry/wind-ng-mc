@@ -20,17 +20,20 @@
  */
 
 include_once(ROOT_PATH.'globals/classes/geocalc.php');
+global $geocalc;
 $geocalc = new geocalc();
 
 include_once(ROOT_PATH.'globals/classes/srtm.php');
-$srtm = new srtm($vars['srtm']['path']);
+global $vars, $srtm;
+$srtm_path = isset($vars['srtm']['path']) ? $vars['srtm']['path'] : '';
+$srtm = $srtm_path ? new srtm($srtm_path) : null;
 
 include_once(ROOT_PATH.'globals/classes/geoimage.php');
 $geoimage = new geoimage();
 
 class nodes_plot {
 
-	function nodes_plot() {
+	function __construct() {
 		
 	}
 	
@@ -55,3 +58,4 @@ class nodes_plot {
 }
 
 ?>
+

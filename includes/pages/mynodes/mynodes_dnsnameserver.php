@@ -23,7 +23,7 @@ class mynodes_dnsnameserver {
 
 	var $tpl;
 	
-	function mynodes_dnsnameserver() {
+	function __construct() {
 		
 	}
 	

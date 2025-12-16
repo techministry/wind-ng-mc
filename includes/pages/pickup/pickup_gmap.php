@@ -23,7 +23,7 @@ class pickup_gmap {
 
 	var $tpl;
 	
-	function pickup_gmap() {
+	function __construct() {
 		
 	}
 	

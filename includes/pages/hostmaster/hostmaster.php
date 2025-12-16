@@ -26,7 +26,7 @@ class hostmaster {
 	var $tpl;
 	var $page;
 	
-	function hostmaster() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "hostmaster_".get('subpage');
 			$this->page = new $p;
@@ -40,3 +40,4 @@ class hostmaster {
 }
 
 ?>
+

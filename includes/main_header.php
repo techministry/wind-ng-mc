@@ -22,18 +22,36 @@
 class header {
 	
 	var $hide=FALSE;
+	var $tpl;
 	
-	function header() {
+	function __construct() {
+		$this->tpl = array();
 	}
 	
 	
 	function output() {
-		if ($this->hide) return;
+		global $main, $vars, $smarty, $construct;
+		if ($this->hide) return '';
+		
+		// Check if custom logo exists
 		if (file_exists(ROOT_PATH.'config/mylogo.png')) {
 			$this->tpl['mylogo'] = TRUE;
 			$this->tpl['mylogo_dir'] = ROOT_PATH.'config/';
+		} else {
+			$this->tpl['mylogo'] = FALSE;
 		}
-		return template($this->tpl, __FILE__);
+		
+		// Use template() to render the header template
+		try {
+			return template($this->tpl, __FILE__);
+		} catch (Throwable $e) {
+			// Fallback to simple header if template fails
+			error_log("Header template error: " . $e->getMessage());
+			$ret = '<div class="table-header">' . "\n";
+			$ret .= '<img src="templates/basic/images/main_logo.png" alt="WiND Logo" />' . "\n";
+			$ret .= '</div>' . "\n";
+			return $ret;
+		}
 	}
 	
 }

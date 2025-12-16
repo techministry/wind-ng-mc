@@ -23,7 +23,7 @@ class gmap_js {
 	
 	var $tpl;
 
-	function gmap_js() {
+	function __construct() {
 		
 	}
 	
@@ -80,3 +80,4 @@ class gmap_js {
 }
 
 ?>
+

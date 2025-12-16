@@ -22,6 +22,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{$lang.iso639}" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset={$lang.charset}" />
 {$head}
 <link href="{$css_dir}styles.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="{$js_dir}overlib/overlib.js"><!-- overLIB (c) Erik Bosrup --></script>
@@ -29,7 +30,7 @@
 <link href="{$css_dir}wavetabs.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="{$js_dir}mootools-compact-1.3.1.js"></script>
 <script type="text/javascript" src="{$js_dir}wavetabs.js"></script>
-{include_php file="/home/wnagr/public_html/globalhr/include.head.php"}
+{* include_php removed - was hardcoded to production server path *}
 </head>
 <body{foreach from=$body_tags item=item key=key} {$key}="{$item}"{/foreach}>
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>

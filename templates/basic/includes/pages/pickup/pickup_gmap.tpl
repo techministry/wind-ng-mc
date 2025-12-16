@@ -19,7 +19,7 @@
  *
  *}
 <table class="table-main" cellpadding="0" cellspacing="0"><tr><td>
-{include file=generic/page-title.tpl title="`$lang.find_coordinates`"}
+{include file="generic/page-title.tpl" title="`$lang.find_coordinates`"}
 </td></tr><tr style="height: 100%"><td>
 <table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%; height: 100%">
 {if $gmap_key_ok}

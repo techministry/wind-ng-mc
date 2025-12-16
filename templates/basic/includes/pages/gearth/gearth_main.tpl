@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include file=generic/page-title.tpl title="`$lang.gearth_download`"}
+{include file="generic/page-title.tpl" title="`$lang.gearth_download`"}
 <center>
 <p>
 </p>

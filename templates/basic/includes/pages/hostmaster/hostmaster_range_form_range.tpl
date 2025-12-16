@@ -80,7 +80,7 @@ function sendmail_changed() {{/literal}
 	<td class="table-form-field">
 		<select class="fld-form-input" name="{$data[3].fullField}" onchange="status_changed()">
 			{section loop=$data[3].Type_Enums name=e}
-			<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file=constructors/form_enum.tpl fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
+			<option value="{$data[3].Type_Enums[e].value|escape}"{if $data[3].Type_Enums[e].value == $data[3].value} selected="selected"{/if}>{include file="constructors/form_enum.tpl" fullField=$data.3.fullField value=$data[3].Type_Enums[e].output}</option>
 			{/section}
 		</select>
 	</td></tr>	

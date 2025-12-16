@@ -26,7 +26,7 @@ class admin_services {
 	var $tpl;
 	var $page;
 
-	function admin_services() {
+	function __construct() {
 		if (get('service') != '') {
 			$p = "admin_services_service";
 			$this->page = new $p;
@@ -83,3 +83,4 @@ class admin_services {
 }
 
 ?>
+

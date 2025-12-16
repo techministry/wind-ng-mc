@@ -30,7 +30,7 @@ class gmap {
 	var $tpl;
 	var $page;
 	
-	function gmap() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "gmap_".get('subpage');
 			$this->page = new $p;

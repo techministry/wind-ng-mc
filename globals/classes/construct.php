@@ -25,8 +25,12 @@ class construct {
 		global $smarty;
 		if (substr(strrchr($template, "."), 1) != "tpl") {
 			$path_parts = pathinfo($template);
-			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$form->info['FORM_NAME'].'.tpl';
-			if (file_exists($smarty->template_dir.$tpl_file)) {
+			$form_name = isset($form->info['FORM_NAME']) ? $form->info['FORM_NAME'] : 'default';
+			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$form_name.'.tpl';
+			// Get template directory using public method for Smarty 5.x compatibility
+			$tpl_dirs = $smarty->getTemplateDir();
+			$template_dir = (is_array($tpl_dirs)) ? $tpl_dirs[0] : $tpl_dirs;
+			if (file_exists($template_dir.$tpl_file)) {
 				$template = $tpl_file;
 			} else {
 				$template='constructors/form.tpl';
@@ -39,8 +43,12 @@ class construct {
 		global $smarty;
 		if (substr(strrchr($template, "."), 1) != "tpl") {
 			$path_parts = pathinfo($template);
-			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$table->info['TABLE_NAME'].'.tpl';
-			if (file_exists($smarty->template_dir.$tpl_file)) {
+			$table_name = isset($table->info['TABLE_NAME']) ? $table->info['TABLE_NAME'] : 'default';
+			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$table_name.'.tpl';
+			// Get template directory using public method for Smarty 5.x compatibility
+			$tpl_dirs = $smarty->getTemplateDir();
+			$template_dir = (is_array($tpl_dirs)) ? $tpl_dirs[0] : $tpl_dirs;
+			if (file_exists($template_dir.$tpl_file)) {
 				$template = $tpl_file;
 			} else {
 				$template='constructors/table.tpl';

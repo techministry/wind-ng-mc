@@ -26,7 +26,7 @@ class admin {
 	var $tpl;
 	var $page;
 	
-	function admin() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "admin_".get('subpage');
 			$this->page = new $p;
@@ -40,3 +40,4 @@ class admin {
 }
 
 ?>
+

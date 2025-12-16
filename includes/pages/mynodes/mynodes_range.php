@@ -23,7 +23,7 @@ class mynodes_range {
 
 	var $tpl;
 	
-	function mynodes_range() {
+	function __construct() {
 		
 	}
 	

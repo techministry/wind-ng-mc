@@ -23,7 +23,7 @@ class pickup_dns_nameservers {
 
 	var $tpl;
 	
-	function pickup_dns_nameservers() {
+	function __construct() {
 		
 	}
 	

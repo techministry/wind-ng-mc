@@ -26,7 +26,7 @@ class admin_regions {
 	var $tpl;
 	var $page;
 	
-	function admin_regions() {
+	function __construct() {
 		if (get('region') != '') {
 			$p = "admin_regions_region";
 			$this->page = new $p;

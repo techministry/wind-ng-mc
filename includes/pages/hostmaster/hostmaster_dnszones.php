@@ -23,7 +23,7 @@ class hostmaster_dnszones {
 
 	var $tpl;
 	
-	function hostmaster_dnszones() {
+	function __construct() {
 		
 	}
 	

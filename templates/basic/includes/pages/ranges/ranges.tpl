@@ -18,11 +18,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include file=generic/page-title.tpl title="`$lang.all_ranges`"}
+{include file="generic/page-title.tpl" title="`$lang.all_ranges`"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.ip_ranges`" content=$table_areas}
+{include file="generic/title1.tpl" title="`$lang.ip_ranges`" content=$table_areas}
 </td>
 </tr>
 </table>

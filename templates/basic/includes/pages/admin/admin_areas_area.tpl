@@ -19,11 +19,11 @@
  *
  *}
 {assign var=t value="area_`$area_method`"}
-{include file=generic/page-title.tpl title="`$lang.$t`"}
+{include file="generic/page-title.tpl" title="`$lang.$t`"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
-{include file=generic/title2.tpl title="`$lang.$t`" content=$form_area}
+{include file="generic/title2.tpl" title="`$lang.$t`" content=$form_area}
 </td>
 </tr>
 </table>

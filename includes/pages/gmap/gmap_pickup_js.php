@@ -23,7 +23,7 @@ class gmap_pickup_js {
 	
 	var $tpl;
 
-	function gmap_pickup_js() {
+	function __construct() {
 		
 	}
 	
@@ -57,3 +57,4 @@ class gmap_pickup_js {
 }
 
 ?>
+

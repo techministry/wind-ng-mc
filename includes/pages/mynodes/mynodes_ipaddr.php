@@ -23,7 +23,7 @@ class mynodes_ipaddr {
 
 	var $tpl;
 	
-	function mynodes_ipaddr() {
+	function __construct() {
 		
 	}
 	

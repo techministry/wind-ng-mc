@@ -19,15 +19,24 @@
  *
  */
 
-include_once(ROOT_PATH."includes/pages/".get('page')."/".get('page').".php");
-
 class center {
 
 	var $page;
 	
-	function center() {
+	function __construct() {
 		$p = get('page');
-		$this->page = new $p;
+		if ($p && file_exists(ROOT_PATH."includes/pages/".$p."/".$p.".php")) {
+			include_once(ROOT_PATH."includes/pages/".$p."/".$p.".php");
+			if (class_exists($p)) {
+				$this->page = new $p;
+			} else {
+				error_log("Page class not found: " . $p);
+				$this->page = null;
+			}
+		} else {
+			error_log("Page file not found: " . $p);
+			$this->page = null;
+		}
 	}
 	
 	function security_check() {
@@ -123,10 +132,17 @@ class center {
 	
 	function output() {
 		global $main;
-		if (!$this->security_check()) {
-			$main->message->set_fromlang('info', 'no_privilege');
-			return;
+		if (!$this->page) {
+			error_log("Center output: page is null");
+			$main->message->set_fromlang('info', 'page_not_found');
+			return '';
 		}
+		if (!$this->security_check()) {
+			error_log("Center output: security check failed");
+			$main->message->set_fromlang('info', 'no_privilege');
+			return '';
+		}
+		// Don't catch errors - let them propagate for debugging
 		return $this->page->output();
 	}
 	

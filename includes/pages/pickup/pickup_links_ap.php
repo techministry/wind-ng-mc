@@ -23,7 +23,7 @@ class pickup_links_ap {
 
 	var $tpl;
 	
-	function pickup_links_ap() {
+	function __construct() {
 		
 	}
 	

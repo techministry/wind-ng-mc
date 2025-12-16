@@ -34,7 +34,7 @@ class nodes {
 	var $tpl;
 	var $page;
 	
-	function nodes() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "nodes_".get('subpage');
 			$this->page = new $p;

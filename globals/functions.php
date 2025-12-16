@@ -51,20 +51,25 @@ function redirect($url, $sec=0, $exit=TRUE) {
 }
 
 function get_qs() {
-	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-		return $_SERVER['QUERY_STRING'];
+	if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET') {
+		return isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
 	} else {
-		return $_POST['query_string'];
+		return isset($_POST['query_string']) ? $_POST['query_string'] : '';
 	}
 }
 
 function get($key) {
 	global $page_admin, $main;
-	if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+	if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET') {
 		$ret = isset($_GET[$key])?$_GET[$key]:null;
 	} else {
-		parse_str($_POST['query_string'], $output);
-		$ret = isset($output[$key])?$output[$key]:null;
+		$qs = isset($_POST['query_string']) ? $_POST['query_string'] : '';
+		if (!empty($qs)) {
+			parse_str($qs, $output);
+			$ret = isset($output[$key])?$output[$key]:null;
+		} else {
+			$ret = null;
+		}
 	}
 	switch ($key) {
 		case 'page':
@@ -170,30 +175,35 @@ function template($assign_array, $file) {
 	}
 	reset_smarty();
 	$smarty->assign($assign_array);
-	return $smarty->fetch($tpl_file);
+	
+	// Fetch template directly with Smarty 5.7.0
+	try {
+		$result = $smarty->fetch($tpl_file);
+		return $result;
+	} catch (Exception $e) {
+		// TEMPORARILY show errors instead of hiding them
+		return '<div style="color:red;border:2px solid red;padding:10px;">Template error: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
+	} catch (Error $e) {
+		return '<div style="color:red;border:2px solid red;padding:10px;">PHP Error in template: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
+	}
 }
 
 function reset_smarty() {
-	global $smarty, $lang;
+	global $smarty, $lang, $vars;
 	$smarty->clearAllAssign();
 	
 	// Smarty 3.x/4.x uses assign() instead of assign_by_ref()
 	$smarty->assign('lang', $lang);
 	
-	// Get template directory - compatible with both Smarty 2.x and 3.x/4.x
-	if (method_exists($smarty, 'getTemplateDir')) {
-		// Smarty 3.x/4.x
-		$tpl_dirs = $smarty->getTemplateDir();
-		$tpl_dir = is_array($tpl_dirs) ? $tpl_dirs[0] : $tpl_dirs;
-	} else {
-		// Smarty 2.x
-		$tpl_dir = $smarty->template_dir;
-	}
+	// Use web-relative paths for templates (needed for JavaScript/browser resources)
+	// These paths are relative to the web root, not filesystem paths
+	$tpl_name = isset($vars['templates']['default']) ? $vars['templates']['default'] : 'basic';
+	$tpl_web_dir = "templates/".$tpl_name."/";
 	
-	$smarty->assign('tpl_dir', $tpl_dir);
-	$smarty->assign('img_dir', $tpl_dir."images/");
-	$smarty->assign('css_dir', $tpl_dir."css/");
-	$smarty->assign('js_dir', $tpl_dir."scripts/javascripts/");
+	$smarty->assign('tpl_dir', $tpl_web_dir);
+	$smarty->assign('img_dir', $tpl_web_dir."images/");
+	$smarty->assign('css_dir', $tpl_web_dir."css/");
+	$smarty->assign('js_dir', $tpl_web_dir."scripts/javascripts/");
 }
 
 function delfile($str) 
@@ -366,12 +376,24 @@ function is_ip($ip, $full_ip=TRUE) {
 function include_gmap($javascript) {
 	global $main, $vars;
 	
-	// Load Leaflet CSS
+	// Debug: Check if $main is available
+	if (!isset($main) || !is_object($main)) {
+		error_log("include_gmap ERROR: \$main is not set or not an object");
+		return FALSE;
+	}
+	if (!isset($main->html) || !is_object($main->html)) {
+		error_log("include_gmap ERROR: \$main->html is not set or not an object");
+		return FALSE;
+	}
+	if (!isset($main->html->head) || !is_object($main->html->head)) {
+		error_log("include_gmap ERROR: \$main->html->head is not set or not an object");
+		return FALSE;
+	}
+	
+	// Load Leaflet CSS (without SRI to avoid CORS issues)
 	$main->html->head->add_link(array(
 		'rel' => 'stylesheet',
-		'href' => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-		'integrity' => 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
-		'crossorigin' => ''
+		'href' => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
 	));
 	
 	// Load Leaflet.markercluster CSS
@@ -384,8 +406,8 @@ function include_gmap($javascript) {
 		'href' => 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css'
 	));
 	
-	// Load Leaflet JS
-	$main->html->head->add_script("text/javascript", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=", "");
+	// Load Leaflet JS (without SRI to avoid CORS issues)
+	$main->html->head->add_script("text/javascript", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js");
 	
 	// Load Leaflet.markercluster JS
 	$main->html->head->add_script("text/javascript", "https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js");
@@ -398,8 +420,8 @@ function include_gmap($javascript) {
 }
 
 function getmicrotime(){ 
-	list($usec, $sec) = explode(" ",microtime()); 
-	return ((float)$usec + (float)$sec); 
+	$mt = explode(" ", microtime()); 
+	return ((float)$mt[0] + (float)$mt[1]); 
 } 
 
 function array_multimerge($array1, $array2) {
@@ -441,7 +463,9 @@ function language_set($language='', $force=FALSE) {
 			$lang = array_multimerge($lang, $lang_overwrite);
 		}
 		// Set-up mbstring's internal encoding (mainly for supporting UTF-8)
-		mb_internal_encoding($lang['charset']);
+		if (function_exists('mb_internal_encoding')) {
+			mb_internal_encoding($lang['charset']);
+		}
 		
 		// Set-up NAMES on database system
 		if($vars['db']['version']>=4.1)

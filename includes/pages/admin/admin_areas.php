@@ -26,7 +26,7 @@ class admin_areas {
 	var $tpl;
 	var $page;
 	
-	function admin_areas() {
+	function __construct() {
 		if (get('area') != '') {
 			$p = "admin_areas_area";
 			$this->page = new $p;

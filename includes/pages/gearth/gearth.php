@@ -31,7 +31,7 @@ class gearth {
 	var $tpl;
 	var $page;
 	
-	function gearth() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "gearth_".get('subpage');
 			$this->page = new $p;
@@ -47,3 +47,4 @@ class gearth {
 }
 
 ?>
+

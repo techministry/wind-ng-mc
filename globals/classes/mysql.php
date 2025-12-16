@@ -34,6 +34,10 @@ class database {
 	var $total_queries=0;
 	var $total_time=0;
 	
+	function __construct($server, $user, $password, $database) {
+		$this->database($server, $user, $password, $database);
+	}
+	
 	function database($server, $user, $password, $database) {
 		if (!$this->mysql_link = @mysql_connect($server, $user, $password, TRUE)) {
 			$this->error();
@@ -43,6 +47,8 @@ class database {
 			$this->error();
 			return;
 		}
+		// Set UTF-8 charset for proper Greek character handling
+		@mysql_set_charset("utf8mb4", $this->mysql_link);
 	}
 	
 	function close_database() {

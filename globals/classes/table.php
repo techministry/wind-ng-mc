@@ -33,14 +33,18 @@ class table {
 		global $db, $vars;
 		if ($limit == '' && $limit !== FALSE) {
 			
-			if ((!isset($this->info['CURRENT_PAGE']) || $this->info['CURRENT_PAGE'] == '') && $_SERVER['REQUEST_METHOD'] == 'GET') {
-				$this->info['CURRENT_PAGE'] = get($this->info['TABLE_NAME']."_showpage");
+			if ((!isset($this->info['CURRENT_PAGE']) || $this->info['CURRENT_PAGE'] == '') && isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'GET') {
+				$table_name = isset($this->info['TABLE_NAME']) ? $this->info['TABLE_NAME'] : '';
+				if ($table_name) {
+					$this->info['CURRENT_PAGE'] = get($table_name."_showpage");
+				}
 			}
 			if (!isset($this->info['CURRENT_PAGE']) || $this->info['CURRENT_PAGE'] == '') {
 				$this->info['CURRENT_PAGE'] = 1;
 			}
 			$page = $this->info['CURRENT_PAGE'];
-			$limit = (($page-1)*$vars['constructor']['max_rows']).', '.$vars['constructor']['max_rows'];
+			$max_rows = (isset($vars['constructor']) && isset($vars['constructor']['max_rows'])) ? $vars['constructor']['max_rows'] : 20;
+			$limit = (($page-1)*$max_rows).', '.$max_rows;
 			$want_pages = true;
 		}
 		$data = $db->get("SQL_CALC_FOUND_ROWS ".$select, $from, $where, $group_by, $order_by, $limit);
@@ -48,9 +52,10 @@ class table {
 			//cirrus problem with tables... check other mysql/php version
 			//$cnt = $db->cnt($select, $from, $where, $group_by, $order_by);
 			$cnt = $db->query_data("SELECT FOUND_ROWS()");
-			$cnt = $cnt[0]['FOUND_ROWS()'];
-			if ($vars['constructor']['max_rows'] != '' && $cnt > $vars['constructor']['max_rows']) {
-				$this->info['TOTAL_PAGES'] = ceil($cnt / $vars['constructor']['max_rows']);
+			$cnt = (is_array($cnt) && isset($cnt[0]['FOUND_ROWS()'])) ? $cnt[0]['FOUND_ROWS()'] : 0;
+			$max_rows = (isset($vars['constructor']) && isset($vars['constructor']['max_rows'])) ? $vars['constructor']['max_rows'] : 20;
+			if ($max_rows != '' && $cnt > $max_rows) {
+				$this->info['TOTAL_PAGES'] = ceil($cnt / $max_rows);
 				for ($i=1;$i<=$this->info['TOTAL_PAGES'];$i++) {
 					$this->info['PAGES'][$i] = makelink(array($this->info['TABLE_NAME']."_showpage" => $i), TRUE);
 				}
@@ -61,7 +66,7 @@ class table {
 		if (isset($data[0])) {
 			$isset = TRUE;
 			array_unshift($data, $data[0]);
-			while (list($key, $value) = each($data[0])) {
+			foreach ($data[0] as $key => $value) {
 				$data[0][$key] = $key;
 			}
 		}
@@ -93,19 +98,27 @@ class table {
 	}
 	
 	function db_data_search($form) {
-		$sc = unserialize(stripslashes(get($form->info['FORM_NAME'].'_search')));
+		$search_str = get((isset($form->info['FORM_NAME']) ? $form->info['FORM_NAME'].'_search' : ''));
+		$sc = array();
+		if ($search_str) {
+			$sc = @unserialize(stripslashes($search_str));
+			if (!is_array($sc)) $sc = array();
+		}
+		$search = array();
 		for ($i=0;$i<count($form->data);$i++) {
 			if (isset($form->data[$i])) {
-				$sf=isset($sc[$form->data[$i]['fullField']])?$sc[$form->data[$i]['fullField']]:null;
-				$search[$form->data[$i]['fullField']] = (isset($_POST[$form->data[$i]['fullField']])?$_POST[$form->data[$i]['fullField']]:$sf);
+				$sf = isset($sc[$form->data[$i]['fullField']]) ? $sc[$form->data[$i]['fullField']] : null;
+				$search[$form->data[$i]['fullField']] = (isset($_POST[$form->data[$i]['fullField']]) ? $_POST[$form->data[$i]['fullField']] : $sf);
 				if (isset($form->data[$i]['Compare'])) {
-					$search[$form->data[$i]['fullField'].'_compare'] = (isset($_POST[$form->data[$i]['fullField'].'_compare']) ? $_POST[$form->data[$i]['fullField'].'_compare'] : $sc[$form->data[$i]['fullField'].'_compare']);
+					$search[$form->data[$i]['fullField'].'_compare'] = (isset($_POST[$form->data[$i]['fullField'].'_compare']) ? $_POST[$form->data[$i]['fullField'].'_compare'] : (isset($sc[$form->data[$i]['fullField'].'_compare']) ? $sc[$form->data[$i]['fullField'].'_compare'] : ''));
 				}
 			}
 		}
 		$search = serialize($search);
+		$form_name = isset($form->info['FORM_NAME']) ? $form->info['FORM_NAME'] : 'form';
+		$table_name = isset($this->info['TABLE_NAME']) ? $this->info['TABLE_NAME'] : 'table';
 		for ($i=1;$i<=$this->info['TOTAL_PAGES'];$i++) {
-			$this->info['PAGES'][$i] = makelink(array($form->info['FORM_NAME']."_search" => $search, $this->info['TABLE_NAME']."_showpage" => $i), TRUE);
+			$this->info['PAGES'][$i] = makelink(array($form_name."_search" => $search, $table_name."_showpage" => $i), TRUE);
 		}
 	}
 	

@@ -37,10 +37,19 @@ class main {
 	var $footer;
 	var $menu;
 	
-	function main() {
+	function __construct() {
+		error_log("Creating html object");
 		$this->html = new html;
+		error_log("HTML object created: " . (is_object($this->html) ? "SUCCESS" : "FAILED"));
+		
+		error_log("Creating userdata object");
 		$this->userdata = new userdata;
+		error_log("Userdata object created: " . (is_object($this->userdata) ? "SUCCESS" : "FAILED"));
+		
+		error_log("Creating message object");
 		$this->message = new message;
+		error_log("Message object created: " . (is_object($this->message) ? "SUCCESS" : "FAILED"));
+		
 		$this->header = new header;
 		$this->center = new center;
 		$this->footer = new footer;
@@ -53,7 +62,9 @@ class main {
 		if (get('session_lang') != '') $_SESSION['lang'] = get('session_lang');
 		language_set(isset($this->userdata->info['language'])?$this->userdata->info['language']:null);
 		// Reload user info from database using SET NAMES (workaround)
-		$this->userdata->load_info();
+		if ($this->userdata) {
+			$this->userdata->load_info();
+		}
 		
 		$this->html->head->add_title($lang['site_title']);
 		$this->html->head->add_meta("text/html; charset=".$lang['charset'], "", "Content-Type");

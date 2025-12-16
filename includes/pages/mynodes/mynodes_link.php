@@ -23,7 +23,7 @@ class mynodes_link {
 
 	var $tpl;
 	
-	function mynodes_link() {
+	function __construct() {
 		
 	}
 	

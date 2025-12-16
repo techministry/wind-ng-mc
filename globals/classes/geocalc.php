@@ -1,4 +1,4 @@
-<?
+<?php
 
 // This code was converted to PHP from Visual C++
 // by Steven Brendtro on behalf of imaginerc.com
@@ -28,10 +28,15 @@ class GeoCalc {
   var $KM2MI = 0.621371;
   var $FLATTENING =  0;
 
-  function GeoCalc() {
+  function __construct() {
   	$this->FLATTENING = 1.0/298.26;  // Earth flattening
                                      // (WGS 1972)
     return;
+  }
+  
+  // Legacy constructor for PHP 5 compatibility
+  function GeoCalc() {
+    $this->__construct();
   }
 
   function GCDistance($lat1, $lon1, $lat2, $lon2) {

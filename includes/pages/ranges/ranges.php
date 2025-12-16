@@ -26,7 +26,7 @@ class ranges {
 	var $tpl;
 	var $page;
 	
-	function ranges() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "ranges_".get('subpage');
 			$this->page = new $p;

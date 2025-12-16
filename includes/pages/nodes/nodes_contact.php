@@ -23,7 +23,7 @@ class nodes_contact {
 
 	var $tpl;
 	
-	function nodes_contact() {
+	function __construct() {
 		
 	}
 	

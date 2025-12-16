@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include assign=panoramic file="generic/photosview_image.tpl" image=$photosview.PANORAMIC}
+{include assign="panoramic" file="generic/photosview_image.tpl" image=$photosview.PANORAMIC}
 <table border="0" cellspacing="0" align="center">
 	<tr>
 	<td colspan="3"><br/></td>
@@ -39,6 +39,6 @@
 	<td class="node-view-right-bottom" >{include file="generic/photosview_image.tpl" image=$photosview.SE}</td>
 	</tr>
 	<tr>
-	<td colspan="3" align="center">{assign var=t value="photos__view_point-PANORAMIC"}{include file=generic/title5.tpl title="`$lang.db.$t`" content=$panoramic}</td>
+	<td colspan="3" align="center">{assign var=t value="photos__view_point-PANORAMIC"}{include file="generic/title5.tpl" title="`$lang.db.$t`" content=$panoramic}</td>
 	</tr>
 </table>

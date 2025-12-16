@@ -18,15 +18,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include assign=help file=generic/help.tpl help=nodes_search}
-{include file=generic/page-title.tpl title="`$lang.all_nodes`" right="$help"}
+{include assign="help" file="generic/help.tpl" help="nodes_search"}
+{include file="generic/page-title.tpl" title="`$lang.all_nodes`" right="$help"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 	<tr>
 		<td class="table-page-split" width="100%">
 		{if $gmap_key_ok!=="nomap"}
 			<table align="center" bgcolor="#DBE0D7" cellpadding="0" cellspacing="2" width="100%">
 				<tr>
-					<td align="left">{include file=generic/link.tpl link=$link_gearth content="`$lang.google_earth`"}</td><td align="right">{include file=generic/link.tpl link=$link_fullmap content="`$lang.new_window`" target="_blank"}</td>
+					<td align="left">{include file="generic/link.tpl" link=$link_gearth content="`$lang.google_earth`"}</td><td align="right">{include file="generic/link.tpl" link=$link_fullmap content="`$lang.new_window`" target="_blank"}</td>
 				</tr>
 				<tr>
 					<td style="font-size:12px; text-align:center;" colspan="2">
@@ -51,12 +51,12 @@
 	</tr>
 	<tr>
 		<td class="table-page-split">
-			{include file=generic/title1.tpl title="`$lang.nodes_search`" content=$form_search_nodes}
+			{include file="generic/title1.tpl" title="`$lang.nodes_search`" content=$form_search_nodes}
 		</td>
 	</tr>
 	<tr>
 		<td class="table-page-pad">
-			{include file=generic/title2.tpl title="`$lang.nodes_found`" content=$table_nodes}
+			{include file="generic/title2.tpl" title="`$lang.nodes_found`" content=$table_nodes}
 		</td>
 	</tr>
 </table>

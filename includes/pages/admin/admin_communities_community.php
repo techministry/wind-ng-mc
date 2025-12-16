@@ -23,7 +23,7 @@ class admin_communities_community {
 
 	var $tpl;
 	
-	function admin_communities_community() {
+	function __construct() {
 		
 	}
 	
@@ -87,3 +87,4 @@ class admin_communities_community {
 }
 
 ?>
+

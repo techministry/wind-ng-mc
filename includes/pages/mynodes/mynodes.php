@@ -27,7 +27,7 @@ class mynodes {
 	var $tpl;
 	var $page;
 
-	function mynodes() {
+	function __construct() {
 		if (get('subpage') != '') {
 			$p = "mynodes_".get('subpage');
 			$this->page = new $p;
@@ -645,3 +645,4 @@ class mynodes {
 }
 
 ?>
+

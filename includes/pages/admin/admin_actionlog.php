@@ -26,7 +26,7 @@ class admin_actionlog {
 	var $tpl;
 	var $page;
 	
-	function admin_actionlog() {
+	function __construct() {
 		if (get('log') != '') {
 			$p = "admin_actionlog_log";
 			$this->page = new $p;

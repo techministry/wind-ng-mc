@@ -23,7 +23,7 @@ class search_query {
 
 	var $tpl;
 	
-	function search_query() {
+	function __construct() {
 		
 	}
 	

@@ -24,7 +24,7 @@ class admin_nodes_services {
 
 	var $tpl;
 	
-	function admin_nodes_services() {
+	function __construct() {
 	}
 
 	function form_search_services_edit() {

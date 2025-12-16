@@ -20,16 +20,19 @@
  */
  
 include_once(ROOT_PATH.'globals/classes/geocalc.php');
+global $geocalc;
 $geocalc = new geocalc();
 
 include_once(ROOT_PATH.'globals/classes/srtm.php');
-$srtm = new srtm($vars['srtm']['path']);
+global $vars, $srtm;
+$srtm_path = isset($vars['srtm']['path']) ? $vars['srtm']['path'] : '';
+$srtm = $srtm_path ? new srtm($srtm_path) : null;
 
 class nodes_plot_link {
 
 	var $tpl;
 
-	function nodes_plot_link() {
+	function __construct() {
 		
 	}
 

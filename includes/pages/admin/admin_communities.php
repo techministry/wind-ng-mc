@@ -26,7 +26,7 @@ class admin_communities {
 	var $tpl;
 	var $page;
 	
-	function admin_communities() {
+	function __construct() {
 		if (get('community') != '') {
 			$p = "admin_communities_community";
 			$this->page = new $p;

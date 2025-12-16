@@ -23,7 +23,7 @@ class hostmaster_dnsnameservers {
 
 	var $tpl;
 	
-	function hostmaster_dnsnameservers() {
+	function __construct() {
 		
 	}
 	

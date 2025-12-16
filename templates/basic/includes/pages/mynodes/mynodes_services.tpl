@@ -18,13 +18,13 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include assign=help file=generic/help.tpl help="mynodes_services_`$services_method`"}
+{include assign="help" file="generic/help.tpl" help="mynodes_services_`$services_method`"}
 {assign var=t value="services_`$services_method`"}
-{include file=generic/page-title.tpl title="`$lang.$t`" right="$help"}
+{include file="generic/page-title.tpl" title="`$lang.$t`" right="$help"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
-{include file=generic/title2.tpl title="`$lang.$t`" content=$form_services}
+{include file="generic/title2.tpl" title="`$lang.$t`" content=$form_services}
 </td>
 </tr>
 </table>

@@ -23,7 +23,7 @@ class admin_services_service {
 
 	var $tpl;
 	
-	function admin_services_service() {
+	function __construct() {
 		
 	}
 	
@@ -62,3 +62,4 @@ class admin_services_service {
 }
 
 ?>
+

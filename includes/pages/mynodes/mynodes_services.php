@@ -23,7 +23,7 @@ class mynodes_services {
 
 	var $tpl;
 	
-	function mynodes_services() {
+	function __construct() {
 		
 	}
 	

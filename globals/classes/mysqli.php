@@ -34,11 +34,17 @@ class database {
 	var $total_queries=0;
 	var $total_time=0;
 	
+	function __construct($server, $user, $password, $database) {
+		$this->database($server, $user, $password, $database);
+	}
+	
 	function database($server, $user, $password, $database) {
 		if (!$this->mysqli_link = mysqli_connect($server, $user, $password, $database)) {
 			$this->error();
 			return;
 		}
+		// Set UTF-8 charset for proper Greek character handling
+		mysqli_set_charset($this->mysqli_link, "utf8mb4");
 	}
 	
 	function close_database() {

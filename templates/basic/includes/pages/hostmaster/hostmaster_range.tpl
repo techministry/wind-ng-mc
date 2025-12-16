@@ -18,32 +18,32 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-{include file=generic/page-title.tpl title="`$lang.ip_range_edit`"}
+{include file="generic/page-title.tpl" title="`$lang.ip_range_edit`"}
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">
-{include assign=range_delete file=generic/link.tpl content="`$lang.delete`" link=$link_range_delete confirm=TRUE}
-{include file=generic/title1.tpl title="`$lang.ip_range_edit`" right="$range_delete" content=$form_range}
+{include assign="range_delete" file="generic/link.tpl" content="`$lang.delete`" link=$link_range_delete confirm="TRUE"}
+{include file="generic/title1.tpl" title="`$lang.ip_range_edit`" right="$range_delete" content=$form_range}
 </td>
 </tr>
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.node_info`" content=$table_node_info}
+{include file="generic/title1.tpl" title="`$lang.node_info`" content=$table_node_info}
 </td>
 </tr>
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.users_info`" content=$table_user_info}
+{include file="generic/title1.tpl" title="`$lang.users_info`" content=$table_user_info}
 </td>
 </tr>
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.links`" content=$table_links}
+{include file="generic/title1.tpl" title="`$lang.links`" content=$table_links}
 </td>
 </tr>
 <tr>
 <td class="table-page-pad">
-{include file=generic/title1.tpl title="`$lang.ip_ranges`" content=$table_ip_ranges}
+{include file="generic/title1.tpl" title="`$lang.ip_ranges`" content=$table_ip_ranges}
 </td>
 </tr>
 </table>
