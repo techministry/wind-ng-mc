@@ -1,4 +1,4 @@
----
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/wnagr/public_html/wind3/
+    - export DEPLOYPATH=/home/wnagr/public_html/wind3
+    - /bin/cp -R . "$DEPLOYPATH"/
