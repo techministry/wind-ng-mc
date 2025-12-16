@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/wnagr/public_html/wind3
+    - export DEPLOYPATH=/home/wnagr/public_html/wind
     - /bin/cp -R config globals includes templates tools vendor index.php "$DEPLOYPATH"/
