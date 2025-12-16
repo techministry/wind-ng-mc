@@ -1,0 +1,4 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/wnagr/public_html/wind3/
