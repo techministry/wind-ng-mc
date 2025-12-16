@@ -403,6 +403,10 @@ $lang = array(
 				'title' => "Registration was completed",
 				'body' => "Your registration was completed successfully. To activate your account, click at the URL that has been sent to your e-mail address."
 			),
+			'site_settings_saved' => array(
+				'title' => "Site Settings",
+				'body' => "Site settings were saved successfully."
+			),
 			'login_success' => array(
 				'title' => "Login Successful",
 				'body' => "You were successfully identified."
@@ -441,6 +445,10 @@ $lang = array(
 			),
 		),
 		'error' => array(
+			'site_settings_save_failed' => array(
+				'title' => "Site Settings",
+				'body' => "Failed to save site settings. Please check file permissions."
+			),
 			'database_error' => array(
 				'title' => "Database error",
 				'body' => "A database error has occured. Please report the problem to the administrator(s)."
@@ -688,7 +696,46 @@ $lang = array(
 	'languages' => array(
 		'greek' => 'Greek',
 		'english' => 'English'
-	)
+	),
+
+	'admin_site_settings' => 'Site Settings',
+	'admin_startup_page_content' => 'Homepage Content',
+	'admin_startup_page_help' => 'Edit the content that appears on the homepage. Use the WYSIWYG editor below.',
+	'save' => 'Save',
+	'admin_actionlog' => 'Action Log',
+	'admin_services' => 'Services',
+	'communities' => 'Communities',
+	'community' => 'Community',
+	'communities_registered' => 'Registered Communities',
+	'communities_add' => 'Add Community',
+	'actionlog' => 'Action Log',
+	'actionlog__date' => 'Date',
+	'actionlog__page' => 'Page',
+	'actionlog__action' => 'Action',
+	'actionlog__data' => 'Data',
+	'communities__id' => 'ID',
+	'communities__name' => 'Name',
+	'communities__windURL' => 'WiND URL',
+	'communities__TOS' => 'Terms of Service',
+	'communities__fullname' => 'Full Name',
+	'communities__dnstld' => 'DNS TLD',
+	'communities__ns1' => 'Nameserver 1',
+	'communities__ns2' => 'Nameserver 2',
+	'communities__admins' => 'Administrators',
+	'nodes__freeifs' => 'Free Interfaces',
+	'nodes__system_identity' => 'System Identity',
+	'adminowner' => 'Admin/Owner',
+	'regions__dns_suffix' => 'DNS Suffix',
+	'regions__image' => 'Image',
+	'regions__min_lat' => 'Min Latitude',
+	'regions__max_lat' => 'Max Latitude',
+	'regions__min_long' => 'Min Longitude',
+	'regions__max_long' => 'Max Longitude',
+	'links__hs_logged_in_msg' => 'Hotspot Login Message',
+	'links__security' => 'Security',
+	'links__ip' => 'IP Address',
+	'freeifs' => 'Free Interfaces',
+	'code' => 'en'
 
 );
 

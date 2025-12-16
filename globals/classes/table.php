@@ -98,6 +98,9 @@ class table {
 	}
 	
 	function db_data_search($form) {
+		if ($form === null || !isset($form->data)) {
+			return;
+		}
 		$search_str = get((isset($form->info['FORM_NAME']) ? $form->info['FORM_NAME'].'_search' : ''));
 		$sc = array();
 		if ($search_str) {

@@ -85,6 +85,7 @@ class menu {
 				$this->tpl['link_admin_areas'] = makelink(array('page' => 'admin', 'subpage' => 'areas'));
 				$this->tpl['link_admin_communities'] = makelink(array('page' => 'admin', 'subpage' => 'communities'));
 				$this->tpl['link_admin_actionlog'] = makelink(array('page' => 'admin', 'subpage' => 'actionlog'));
+				$this->tpl['link_admin_site'] = makelink(array('page' => 'admin', 'subpage' => 'site'));
 			}
 			if ($main->userdata->privileges['cadmin'] === TRUE) {
 				$this->tpl['is_admin'] = TRUE;

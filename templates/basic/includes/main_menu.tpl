@@ -239,7 +239,12 @@
 				{/if}
 				{if $link_admin_actionlog != ''}
 				<tr class="table-form-row1">
-					<td colspan="2" class="table-form-title"><img src="templates/basic/images/areas-small.png" alt="{$lang.areas}" />&nbsp;<a href="{$link_admin_actionlog}">action log</a></td>
+					<td colspan="2" class="table-form-title"><img src="templates/basic/images/areas-small.png" alt="{$lang.areas}" />&nbsp;<a href="{$link_admin_actionlog}">{$lang.admin_actionlog}</a></td>
+				</tr>
+				{/if}
+				{if $link_admin_site != ''}
+				<tr class="table-form-row1">
+					<td colspan="2" class="table-form-title"><img src="templates/basic/images/services-small.png" alt="{$lang.admin_site_settings}" />&nbsp;<a href="{$link_admin_site}">{$lang.admin_site_settings}</a></td>
 				</tr>
 				{/if}
 				<tr>

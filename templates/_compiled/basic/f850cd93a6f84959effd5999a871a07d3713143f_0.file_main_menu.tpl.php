@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 5.7.0, created on 2025-12-16 16:33:23
+/* Smarty version 5.7.0, created on 2025-12-16 22:13:04
   from 'file:includes/main_menu.tpl' */
 
 /* @var \Smarty\Template $_smarty_tpl */
 if ($_smarty_tpl->getCompiled()->isFresh($_smarty_tpl, array (
   'version' => '5.7.0',
-  'unifunc' => 'content_694189d38d8142_05967726',
+  'unifunc' => 'content_6941d9701144c5_22796330',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'f850cd93a6f84959effd5999a871a07d3713143f' => 
     array (
       0 => 'includes/main_menu.tpl',
-      1 => 1765893819,
+      1 => 1765923175,
       2 => 'file',
     ),
   ),
@@ -22,7 +22,7 @@ if ($_smarty_tpl->getCompiled()->isFresh($_smarty_tpl, array (
     'file:generic/link.tpl' => 6,
   ),
 ))) {
-function content_694189d38d8142_05967726 (\Smarty\Template $_smarty_tpl) {
+function content_6941d9701144c5_22796330 (\Smarty\Template $_smarty_tpl) {
 $_smarty_current_dir = 'D:\\users\\admin\\GitHub\\wind-ng-mc\\templates\\basic\\includes';
 ?><table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-middle-left">
 	<tr>
@@ -327,7 +327,16 @@ for ($__section_row_0_iteration = 1, $_smarty_tpl->tpl_vars['__smarty_section_ro
 				<tr class="table-form-row1">
 					<td colspan="2" class="table-form-title"><img src="templates/basic/images/areas-small.png" alt="<?php echo $_smarty_tpl->getValue('lang')['areas'];?>
 " />&nbsp;<a href="<?php echo $_smarty_tpl->getValue('link_admin_actionlog');?>
-">action log</a></td>
+"><?php echo $_smarty_tpl->getValue('lang')['admin_actionlog'];?>
+</a></td>
+				</tr>
+				<?php }?>
+				<?php if ($_smarty_tpl->getValue('link_admin_site') != '') {?>
+				<tr class="table-form-row1">
+					<td colspan="2" class="table-form-title"><img src="templates/basic/images/services-small.png" alt="<?php echo $_smarty_tpl->getValue('lang')['admin_site_settings'];?>
+" />&nbsp;<a href="<?php echo $_smarty_tpl->getValue('link_admin_site');?>
+"><?php echo $_smarty_tpl->getValue('lang')['admin_site_settings'];?>
+</a></td>
 				</tr>
 				<?php }?>
 				<tr>
