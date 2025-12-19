@@ -18,8 +18,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *}
-<form name="{$extra_data.FORM_NAME}" method="post" action="{$action_url}">
+{assign var=use_pickup value=false}
+{assign var="form_action" value=$action_url|default:"?`$hidden_qs`"}
+<form name="{$extra_data.FORM_NAME}" method="post" action="{$form_action}">
 <input type="hidden" name="form_name" value="{$extra_data.FORM_NAME}" />
+<input type="hidden" name="query_string" value="{$hidden_qs|escape}" />
 <table class="table-form">
 {assign var=row_num value=1}
 {foreach from=$data item=field}
@@ -45,7 +48,22 @@
 		{foreach from=$field.Type_Enums item=enum}
 			<input type="radio" name="{$field.fullField}" value="{$enum.value|escape}"{if $enum.value == $field.value} checked="checked"{/if} />{include file="constructors/form_enum.tpl" fullField=$fullField value=$enum.output}<br />
 		{/foreach}
-	{elseif $field.Field|truncate:8:"":true == 'password'}
+	{elseif $field.Type == 'pickup'}
+		{assign var=use_pickup value=true}
+		<input type="hidden" name="{$field.fullField}" value="{$field.Type_Pickup.value|escape}" />
+		<input type="text" disabled="disabled" class="fld-form-input-pickup" name="{$field.fullField}_output" value="{$field.Type_Pickup.output|escape}" />
+		<a href="javascript: t = window.open('?page=pickup&subpage=users&object='+encodeURIComponent('{$extra_data.FORM_NAME}.elements[\'{$field.fullField}\']'), 'popup', 'width=640,height=480,scrollbars=yes,resizable=yes'); t.focus();">[{$lang.select}]</a>
+		{if $field.Null == 'YES'}<a href="javascript: document.{$extra_data.FORM_NAME}.elements['{$field.fullField}'].value = ''; document.{$extra_data.FORM_NAME}.elements['{$field.fullField}_output'].value = '';">[{$lang.clear}]</a>{/if}
+	{elseif $field.Type == 'pickup_multi'}
+		{assign var=use_pickup value=true}
+		<select class="fld-form-input" name="{$field.fullField}[]" size="5" multiple="multiple">
+			{foreach from=$field.Type_Pickup item=pickupVal}
+			<option value="{$pickupVal.value|escape}" selected="selected">{$pickupVal.output|escape}</option>
+			{/foreach}
+		</select>
+		<a href="javascript: t = window.open('?page=pickup&subpage=users&object='+encodeURIComponent('{$extra_data.FORM_NAME}.elements[\'{$field.fullField}[]\']'), 'popup', 'width=640,height=480,scrollbars=yes,resizable=yes'); t.focus();">[{$lang.add}]</a>
+		<a href="javascript: remove_selected(document.{$extra_data.FORM_NAME}.elements['{$field.fullField}[]']);">[{$lang.remove}]</a>
+	{elseif $field.Field|substr:0:8 == 'password'}
 		<input class="fld-form-input" name="{$field.fullField}" type="password" value="{$field.value|escape}" />
 	{else}
 		<input class="fld-form-input" name="{$field.fullField}" type="text" value="{$field.value|escape}" />
@@ -59,3 +77,4 @@
 	</tr>
 </table>
 </form>
+{if $use_pickup}<script type="text/javascript" src="{$js_dir}pickup.js"></script>{/if}

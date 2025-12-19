@@ -29,7 +29,7 @@ class search_query {
 	
 	function output() {
 		global $db, $vars;
-		$q = get('q');
+		$q = get('q') ?? '';
 		if(strrpos($q, "#")!==false && intval(substr(strrchr($q,'#'),1))!=0) {
 			$q = intval(substr(strrchr($q,'#'),1));
 		}

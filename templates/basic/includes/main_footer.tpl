@@ -1,38 +1,64 @@
 {*
- * WiND - Wireless Nodes Database
- * Basic HTML Template
- *
- * Copyright (C) 2005 Konstantinos Papadimitriou <vinilios@cube.gr>
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; version 2 dated June, 1991.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
+ * WiND - Wireless Nodes Database - Basic Footer
+ * Simplified footer with theme selector
  *}
-<table cellpadding="5" cellspacing="0" class="table-main">
-      <tr>
-        <td class="footer" align="left" width="33%">
-        	<a href="http://www.php.net/"><img src="{$img_dir}logo-php.gif" alt="PHP Hypertext Preprocessor" /></a>
-        	<a href="http://www.mysql.com/"><img src="{$img_dir}logo-mysql.gif" alt="MySQL database server" /></a>
-        	<a href="http://smarty.php.net/"><img src="{$img_dir}logo-smarty.gif" alt="smarty template engine" /></a>
-        </td>
-        <td class="footer" align="center" width="33%">
-        	PHP time: {$php_time|round:3} s<br />MySQL time: {$mysql_time|round:3} s{if $debug_mysql}<br />Debug: <a href="{$debug_mysql}" target="debug">MySQL</a>{/if}
-        </td>
-        <td class="footer" align="right" width="33%">
-        	<b>WiND - Wireless Nodes Database</b><br />
-        	Project page: <a href="http://www.wna.gr/trac/wiki/wind-wna">WNA-WiND/</a><br /><br />
-        	&copy; 2005-2012 <a href="http://www.wna.gr/trac/wiki/wind-wna/Team">WiND development team</a>
-		   <br /><br /><br />
-        </td>
-      </tr>
-</table>
+<div style="margin-top:16px;padding:12px;border:1px solid #e0e0e0;border-radius:6px;background:#fff;text-align:center;font-size:13px;color:#444;">
+  <div style="margin-bottom:6px;">
+    &copy; 2005-2025 <a href="http://www.wna.gr/trac/wiki/wind-wna/Team">WiND development team</a>
+    &middot; PHP: {$php_time|round:3}s &middot; MySQL: {$mysql_time|round:3}s
+    {if $debug_mysql}&middot; <a href="{$debug_mysql}" target="debug">Debug</a>{/if}
+  </div>
+  <div style="display:flex;justify-content:center;gap:12px;align-items:center;flex-wrap:wrap;">
+    {if $available_themes|@count > 1}
+      <label for="themeSwitcherBasic" style="font-weight:bold;">Theme:</label>
+      <select id="themeSwitcherBasic" onchange="javascript: var p=new URLSearchParams(window.location.search); p.set('theme', this.value); window.location.search = p.toString();" style="margin-left:6px;padding:4px 8px;">
+        {foreach from=$available_themes item=theme}
+          <option value="{$theme}" {if $theme == $current_theme}selected="selected"{/if}>{$theme|capitalize}</option>
+        {/foreach}
+      </select>
+    {/if}
+    <label for="colorSchemeBasic" style="font-weight:bold;">Style:</label>
+    <select id="colorSchemeBasic" style="margin-left:6px;padding:4px 8px;">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </div>
+</div>
+{literal}
+<script>
+  (function() {
+    // Fallback helpers if head script failed to load for any reason
+    function ensureHelpers() {
+      if (!window.getSiteTheme) {
+        window.getSiteTheme = function() { return 'light'; };
+      }
+      if (!window.setSiteTheme) {
+        window.setSiteTheme = function(theme) {
+          var dark = document.getElementById('dark-theme-css');
+          if (theme === 'dark') {
+            if (dark) dark.disabled = false;
+          } else {
+            if (dark && dark.parentNode) dark.parentNode.removeChild(dark);
+          }
+        };
+      }
+    }
+
+    function initSelector() {
+      var sel = document.getElementById('colorSchemeBasic');
+      if (!sel) return;
+      ensureHelpers();
+      sel.value = window.getSiteTheme();
+      sel.addEventListener('change', function() {
+        window.setSiteTheme(sel.value);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSelector);
+    } else {
+      initSelector();
+    }
+  })();
+</script>
+{/literal}

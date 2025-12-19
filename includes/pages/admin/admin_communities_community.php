@@ -28,41 +28,57 @@ class admin_communities_community {
 	}
 	
 	function form_community() {
-		#global $db, $vars;
 		global $main, $db, $vars, $lang;
 		$form_community = new form(array('FORM_NAME' => 'form_community'));
-		$form_community->db_data('communities.id as community_id, communities.name, communities.windURL, communities.TOS, communities.fullname, communities.dnstld, communities.ns1,communities.ns2, communities.central-node as cnode, communities.admins AS cadmins_ids');
+		// Note: Don't use SQL aliases (AS) or hyphens in column names with db_data() - they aren't parsed correctly
+		$form_community->db_data('communities.id, communities.name, communities.windURL, communities.TOS, communities.fullname, communities.dnstld, communities.ns1, communities.ns2');
 		$form_community->db_data_values("communities", "id", get('community'));
+		
 		if (get('community') != 'add') {
-		#$table_communities->data[$i]['ns1'] = long2ip($table_communities->data[$i]['ns1']);
-		#$table_communities->data[$i]['ns2'] = long2ip($table_communities->data[$i]['ns2']);
-			$form_community->data[5]['value'] = long2ip($form_community->data[5]['value']);
+			// Convert IP addresses from long to dotted format
 			$form_community->data[6]['value'] = long2ip($form_community->data[6]['value']);
+			$form_community->data[7]['value'] = long2ip($form_community->data[7]['value']);
 		}
-			$form_community->data[7]['Field'] = 'cnode';
-			$form_community->data[8]['Field'] = 'cadmins_ids';
-			$form_community->data[8]['fullField'] = 'cadmins_ids';
-
-			#if (get('node') == 'add') {
+		
+		// Manually add the cadmins_ids pickup field with full structure
+		$cadmins_index = count($form_community->data);
+		$form_community->data[$cadmins_index] = array(
+			'Field' => 'cadmins_ids',
+			'fullField' => 'cadmins_ids',
+			'Type' => 'text',
+			'Null' => 'YES',
+			'Key' => '',
+			'Default' => '',
+			'Extra' => '',
+			'value' => ''
+		);
+		
+		// Get current community admin(s) if editing, or current user if adding
+		if (get('community') != 'add') {
+			$community_data = $db->get("admins", "communities", "id = '".get('community')."'");
+			if (!empty($community_data[0]['admins'])) {
+				$admin_id = $community_data[0]['admins'];
+				$temp = $db->get("users.id AS value, users.username AS output", "users", "users.id = '".$admin_id."'");
+			} else {
 				$temp = $db->get("users.id AS value, users.username AS output", "users", "users.id = '".$main->userdata->user."'");
-			#} else {
-			#	$temp = $db->get("users.id AS value, users.username AS output", "users_nodes, users", "users.id = users_nodes.user_id AND users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner = 'Y'");
-			#}
-			$form_community->db_data_pickup("cadmins_ids", "users", $temp);
-			#$form_community->db_data_pickup("users_nodes.user_id", "users", $db->get("users.id AS value, users.username AS output", "users_nodes, users", "users.id = users_nodes.user_id AND users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner != 'Y'"), TRUE);
-		#if (get('node') != 'add') {
-			######$form_community->db_data_pickup("users_nodes.user_id", "users", $db->get("users.id AS value, users.username AS output", "users_nodes, users", "users.id = users_nodes.user_id AND users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner != 'Y'"), TRUE);
-		#	} else {
-				#$form_community->db_data_pickup("users_nodes.user_id", "users", null, TRUE);
-		#	}
-		$form_community->db_data_remove('community_id');
+			}
+		} else {
+			$temp = $db->get("users.id AS value, users.username AS output", "users", "users.id = '".$main->userdata->user."'");
+		}
+		$form_community->db_data_pickup("cadmins_ids", "users", $temp);
+		
+		// DEBUG: Log the cadmins field after pickup setup
+		error_log("DEBUG form_community: cadmins field after pickup: " . print_r($form_community->data[$cadmins_index], true));
+		
+		// Remove the id field from being displayed (we don't want to show community_id)
+		$form_community->db_data_remove('communities__id');
 		return $form_community;
 	}
 	
 	function output() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($this, 'output_onpost_'.$_POST['form_name'])) return call_user_func(array($this, 'output_onpost_'.$_POST['form_name']));
 		global $construct;
-		$this->tpl['community_method'] = (get('communities') == 'add' ? 'add' : 'edit' );
+		$this->tpl['communities_method'] = (get('community') == 'add' ? 'add' : 'edit' );
 		$this->tpl['form_community'] = $construct->form($this->form_community(), __FILE__);
 		return template($this->tpl, __FILE__);
 	}

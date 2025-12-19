@@ -27,6 +27,8 @@ class construct {
 			$path_parts = pathinfo($template);
 			$form_name = isset($form->info['FORM_NAME']) ? $form->info['FORM_NAME'] : 'default';
 			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$form_name.'.tpl';
+			// Normalize slashes for cross-platform compatibility
+			$tpl_file = str_replace('\\', '/', $tpl_file);
 			// Get template directory using public method for Smarty 5.x compatibility
 			$tpl_dirs = $smarty->getTemplateDir();
 			$template_dir = (is_array($tpl_dirs)) ? $tpl_dirs[0] : $tpl_dirs;
@@ -45,6 +47,8 @@ class construct {
 			$path_parts = pathinfo($template);
 			$table_name = isset($table->info['TABLE_NAME']) ? $table->info['TABLE_NAME'] : 'default';
 			$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'_'.$table_name.'.tpl';
+			// Normalize slashes for cross-platform compatibility
+			$tpl_file = str_replace('\\', '/', $tpl_file);
 			// Get template directory using public method for Smarty 5.x compatibility
 			$tpl_dirs = $smarty->getTemplateDir();
 			$template_dir = (is_array($tpl_dirs)) ? $tpl_dirs[0] : $tpl_dirs;

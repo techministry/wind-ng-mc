@@ -29,6 +29,9 @@ class startup {
 	
 	function output() {
 		if (file_exists(ROOT_PATH."config/startup.html")) $this->tpl['startup_html'] = file_get_contents(ROOT_PATH."config/startup.html");
+		// Attach map scripts for the homepage
+		$this->tpl['gmap_key_ok'] = include_gmap("?page=gmap&subpage=js");
+		$this->tpl['link_fullmap'] = makelink(array("page" => "gmap"));
 		return template($this->tpl, __FILE__);
 	}
 

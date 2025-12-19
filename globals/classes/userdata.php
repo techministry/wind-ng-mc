@@ -31,12 +31,17 @@ class userdata {
 	var $primary_key = "id";
 	var $username_key = "username";
 	var $password_key = "password";
-	var $info_keys = "username, name, surname, date_in, last_visit, last_session, status, language";
+	var $info_keys = "username, name, surname, date_in, last_visit, last_session, status, language, theme";
 	var $last_session_key = "last_session";
 	var $last_visit_key = "last_visit";
 	
 	function __construct() {
 		session_start();
+		// Short-circuit auto login if this request is explicitly logging out
+		if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+			$this->logout();
+			return;
+		}
 		if (isset($_SESSION['userdata'][$this->primary_key])) {
 			$this->logged = TRUE;
 			$this->user = $_SESSION['userdata'][$this->primary_key];
@@ -64,8 +69,12 @@ class userdata {
 	function load_info() {
 		if ($this->logged) {
 			global $db;
-			$get_res = $db->get($this->info_keys, $this->users_table, $this->primary_key." = '$this->user'");		
-			$this->info = $get_res[0];
+			$get_res = $db->get($this->info_keys, $this->users_table, $this->primary_key." = '$this->user'");
+			// Fallback if custom columns are missing (e.g., theme not migrated yet)
+			if (!$get_res || !isset($get_res[0])) {
+				$get_res = $db->get("username, name, surname, date_in, last_visit, last_session, status, language", $this->users_table, $this->primary_key." = '$this->user'");
+			}
+			$this->info = isset($get_res[0]) ? $get_res[0] : array();
 			
 			// EDIT HERE
 			$get_res = $db->get('type', 'rights', "user_id = '$this->user'");		
@@ -73,10 +82,17 @@ class userdata {
 				$this->privileges[$value['type']] = TRUE;
 			}
 			//
+			// Cache per-user template preference in session for the current request
+			if (isset($this->info['theme']) && $this->info['theme'] !== '') {
+				$_SESSION['user_template'] = $this->info['theme'];
+			} else {
+				unset($_SESSION['user_template']);
+			}
 			
 		} else {
 			unset($this->info);
 			unset($this->privileges);
+			unset($_SESSION['user_template']);
 		}
 	}
 	
@@ -102,12 +118,23 @@ class userdata {
 	
 	function logout() {
 		if ($this->logged) {
-			cookie('userdata['.$this->primary_key.']', '');
-			cookie('userdata['.$this->password_key.']', '');
+			// Clear persistent cookies immediately
+			@setcookie('userdata['.$this->primary_key.']', '', time() - 3600, "/");
+			@setcookie('userdata['.$this->password_key.']', '', time() - 3600, "/");
+			// Reset session state
+			$_SESSION = array();
+			if (session_id() !== '' || isset($_COOKIE[session_name()])) {
+				@setcookie(session_name(), '', time() - 3600, "/");
+			}
+			session_destroy();
 			$this->logged = FALSE;
 			$this->user = '';
-			session_destroy();
+		} else {
+			// Also clear stray cookies even if we think we're logged out
+			@setcookie('userdata['.$this->primary_key.']', '', time() - 3600, "/");
+			@setcookie('userdata['.$this->password_key.']', '', time() - 3600, "/");
 		}
+		unset($_SESSION['user_template']);
 		$this->load_info();
 	}
 	

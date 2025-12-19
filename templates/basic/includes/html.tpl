@@ -25,6 +25,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset={$lang.charset}" />
 {$head}
 <link href="{$css_dir}styles.css" rel="stylesheet" type="text/css" />
+{if $site_theme == 'dark'}
+<link href="{$css_dir}dark.css" rel="stylesheet" type="text/css" id="dark-theme-css" />
+{/if}
 <script type="text/javascript" src="{$js_dir}overlib/overlib.js"><!-- overLIB (c) Erik Bosrup --></script>
 <!-- tabs - wavesoft@wna.gr -->
 <link href="{$css_dir}wavetabs.css" rel="stylesheet" type="text/css" />

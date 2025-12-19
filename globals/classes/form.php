@@ -74,9 +74,10 @@ class form {
 
 	function db_data_pickup($data_field, $subpage, $values, $multi=FALSE) {
 		for ($i=0;$i<count($this->data);$i++) {
-			if ($data_field == str_replace("__", ".", $this->data[$i]['fullField'])) {
+			if (isset($this->data[$i]['fullField']) && $data_field == str_replace("__", ".", $this->data[$i]['fullField'])) {
 				$this->data[$i]['Type'] = 'pickup'.($multi==FALSE?'':"_multi");
-				$this->data[$i]['Pickup_url'] = makelink(array("page" => "pickup", "subpage" => $subpage, "object" => $this->info['FORM_NAME'].".elements['".str_replace(".", "__", $data_field).($multi==FALSE?'':"[]")."']"));
+				// Pass FALSE for htmlspecialchars since URL is used in JavaScript, not directly in HTML
+				$this->data[$i]['Pickup_url'] = makelink(array("page" => "pickup", "subpage" => $subpage, "object" => $this->info['FORM_NAME'].".elements['".str_replace(".", "__", $data_field).($multi==FALSE?'':"[]")."']"), FALSE, TRUE, FALSE);
 				if ($multi == FALSE) {
 					$this->data[$i]['Type_Pickup'] = $values[0];
 				} else {

@@ -1,0 +1,238 @@
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>WiND - Wireless Nodes Database</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<script type="text/javascript" src="?page=search&amp;subpage=suggest_js" ></script>
+
+<link href="templates/basic/css/styles.css" rel="stylesheet" type="text/css" />
+<link href="templates/basic/css/dark.css" rel="stylesheet" type="text/css" id="dark-theme-css" />
+<script type="text/javascript" src="templates/basic/scripts/javascripts/overlib/overlib.js"><!-- overLIB (c) Erik Bosrup --></script>
+<!-- tabs - wavesoft@wna.gr -->
+<link href="templates/basic/css/wavetabs.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="templates/basic/scripts/javascripts/mootools-compact-1.3.1.js"></script>
+<script type="text/javascript" src="templates/basic/scripts/javascripts/wavetabs.js"></script>
+</head>
+<body>
+<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
+<body>
+<table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-main">
+    <tr>
+    <td colspan="2" class="table-main-td-header"><table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-header">
+      <tr>
+        <td class="table-header-td-left"><img src="templates/basic/images/main_logo.png" alt="WiND Logo" /></td>
+      </tr>
+</table>
+</td>
+  </tr>
+    
+  <tr>
+      <td class="table-main-td-middle"><table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-middle-left">
+	<tr>
+		<td class="small-menu">
+			<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+				<tr bgcolor="#FFFFFF">
+					<td class="table-small-menu-text"><a href="?" class="menu-link">Home</a></td>
+				</tr>
+			  
+		              <tr bgcolor="#FFFFFF">
+					<td class="table-small-menu-text"><a href="../forum" class="menu-link">WNA forum</a></td>
+				</tr>
+			  
+			
+								<tr bgcolor="#FFFFFF">
+					<td class="table-small-menu-text"><a href="http://www.wna.gr/forum/member.php?action=register" class="menu-link">Register</a></td>
+				</tr>
+				<tr bgcolor="#FFFFFF">
+					<td class="table-small-menu-text"><a href="http://www.wna.gr/forum/member.php?action=lostpw" class="menu-link">Recover Password</a></td>
+				</tr>
+
+		             
+
+		 		<tr>
+					<td class="table-middle-left-pad"></td>
+			  	</tr>
+			</table>
+	  	</td>
+	</tr>
+	<tr>
+		<td class="search-menu">
+			<table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-search-menu">
+				<tr>
+					<td class="table-search-menu-text"><img src="templates/basic/images/search_nodes.gif" width="16" height="16" alt="Network Nodes" />&nbsp;<a href="?page=nodes">Network Nodes</a></td>
+			  	</tr>
+			  					<tr>
+					<td class="table-search-menu-text"><img src="templates/basic/images/dns-small.png" width="16" height="16" alt="Communities" />&nbsp;<a href="?page=communities">Communities</a></td>
+			  	</tr>
+			  	<tr>
+					<td class="table-search-menu-text"><img src="templates/basic/images/search_ip.gif" width="16" height="16" alt="IP Addressing" />&nbsp;<a href="?page=ranges&amp;subpage=search">IP Addressing</a></td>
+				</tr>
+				<tr>
+					<td class="table-search-menu-text"><img src="templates/basic/images/services.gif" width="16" height="16" alt="Network services" />&nbsp;<a href="?page=services">Network services</a></td>
+		  		</tr>
+			  	<tr>
+					<td class="table-search-menu-text">
+						<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table-search-menu">
+							<tr>
+								<td><img src="templates/basic/images/search.gif" width="32" height="32" alt="Quick Search" /></td>
+								<td style="font-size: 12px;">
+									<form name="search" method="get" action="?">
+									<input type="hidden" name="page" value="search" />
+									<table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-main">
+										<tr>
+											<td style="font-size: 12px;" width="100%">&nbsp;Quick Search <a href="javascript:document.search.submit()"><img src="templates/basic/images/submit1.png" alt="OK" /></a></td>
+										</tr>
+										<tr>
+											<td>
+												<div>
+												<input type="text" id="q" name="q" autocomplete="off" onkeydown="" onfocus="hover('',this.value);" onkeyup="hover(event.keyCode,this.value);"  onblur="setTimeout('hideSearch()',500); hov=0;" />
+												</div>
+												<div align="left" id="searchResult" name="searchResult" style="font-family:Arial; font-size:12px; background-color: white; border:#000000 dashed 1px; padding:0px; display: none; position: absolute; width: 150px;"></div>
+											</td>
+										</tr>
+									</table>
+									</form>
+								</td>
+							</tr>
+						</table>
+					</td>
+			  	</tr>
+			  	<tr>
+					<td class="table-middle-left-pad"></td>
+			  	</tr>
+			</table>
+		</td>
+	</tr>
+
+	<tr>
+    	<td class="search-menu">
+			<table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-search-menu">
+				<tr>
+					<td colspan="2" class="quick-login-title">Statistics</td>
+			  	</tr>
+			  	<tr>
+					<td rowspan="6" class="quick-login-text"><img src="templates/basic/images/stats.png" width="48" height="48" alt="Statistics" /></td>
+					<td class="quick-login-text">18 <span style="color: black;">Wireless Communities</span>
+<br>1428/1263 <span style="color: black;">active nodes</span></td>
+					
+			  	</tr>
+							  	
+			  	<tr>
+					<td class="quick-login-text">1182 <span style="color: black;">backbone nodes</span></td>
+			  	</tr>
+			  	<tr>
+					<td class="quick-login-text">468 <span style="color: black;">links</span></td>
+			  	</tr>
+				
+			  	<tr>
+					<td class="quick-login-text">281 <span style="color: black;">access points</span>
+					<br>29 <span style="color: black;">Hotspots</span></td>
+			  	</tr>
+				
+			  	<tr>
+					<td class="quick-login-text">104/105 <span style="color: black;">active services</span></td>
+			  </tr>
+			  	<tr>
+					<td colspan="2" class="table-middle-left-pad"></td>
+			  	</tr>
+			</table>
+        </td>
+	</tr>
+
+   </table>
+</td>
+      
+    
+    <td class="table-middle-right-td">
+	<table border="0" cellpadding="0" cellspacing="0" class="table-middle-right">
+  			<tr>
+			<td class="quick-login" width="100%">
+							<form name="form_login" method="post" action="?">
+<input type="hidden" name="query_string" value="page=mynodes&node=add" />
+<input type="hidden" name="form_name" value="form_login" />
+<table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-quick-login">
+<tr>
+<td nowrap="nowrap" class="quick-login-title">Log in |</td>
+<td nowrap="nowrap" class="quick-login-field">User Name:
+<input name="users__username" type="text" class="fld-quick-login" /></td>
+<td nowrap="nowrap" class="quick-login-field">Password:
+<input name="users__password" type="password" class="fld-quick-login" />
+</td>
+<td nowrap="nowrap" class="quick-login-field"><input type="checkbox" name="save_login" value="Y" /></td>
+<td class="quick-login-submit">
+<input type="submit" value="Log in" class="btn-login" /></td>
+</tr>
+</table>
+</form>
+						</td>
+			<td nowrap="nowrap" class="quick-login-field">
+								<a href="?page=mynodes&amp;node=add&amp;session_lang=english"><img alt="English" src="templates/basic/images/flags/english.gif" /></a> 
+								<a href="?page=mynodes&amp;node=add&amp;session_lang=greek"><img alt="Greek" src="templates/basic/images/flags/greek.gif" /></a> 
+							</td>
+		</tr>
+	  		<tr>
+			<td class="main-page" colspan="2">
+    			    				<table width="100%" border="0" cellpadding="50" cellspacing="0">
+    					<tr>
+    						<td align="center">
+    							<table width="400" align="center">
+<tr><td><table width="100%"  border="0" cellspacing="0" cellpadding="0" class="table-d1">
+	<tr>
+		<td width="6" class="table-d1-side">&nbsp;</td>
+		<td nowrap="nowrap" class="table-d1-title-text" >
+			Not authorized
+		</td>
+				<td width="10" class="table-d1-title-space"></td>
+		<td width="299" class="table-d1-title-border">&nbsp;</td>
+		<td width="6" class="table-d1-side2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td rowspan="2" class="table-d1-side">&nbsp;</td>
+		<td colspan="3" class="table-d1-title-down"></td>
+		<td rowspan="2" class="table-d1-side2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="3" class="table-d1-text1">
+			You are not authorized to view this page. 
+		</td>
+	</tr>
+</table></td></tr>
+</table>
+    						</td>
+    					</tr>
+    				</table>
+    						</td>
+		</tr>
+	</table>
+	
+	</td>
+</tr>
+    
+    <tr>
+    <td colspan="2" class="table-main-td-footer"><table cellpadding="5" cellspacing="0" class="table-main">
+      <tr>
+        <td class="footer" align="left" width="33%">
+        	<a href="http://www.php.net/"><img src="templates/basic/images/logo-php.gif" alt="PHP Hypertext Preprocessor" /></a>
+        	<a href="http://www.mysql.com/"><img src="templates/basic/images/logo-mysql.gif" alt="MySQL database server" /></a>
+        	<a href="http://smarty.php.net/"><img src="templates/basic/images/logo-smarty.gif" alt="smarty template engine" /></a>
+        </td>
+        <td class="footer" align="center" width="33%">
+        	PHP time: 0.867 s<br />MySQL time: 0.608 s        </td>
+        <td class="footer" align="right" width="33%">
+        	<b>WiND - Wireless Nodes Database</b><br />
+        	Project page: <a href="http://www.wna.gr/trac/wiki/wind-wna">WNA-WiND/</a><br /><br />
+        	&copy; 2005-2025 <a href="http://www.wna.gr/trac/wiki/wind-wna/Team">WiND development team</a>
+		   <br /><br /><br />
+        </td>
+      </tr>
+</table></td>
+  </tr>
+  </table>
+</body>
+
+</body>
+</html>

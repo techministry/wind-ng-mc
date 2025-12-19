@@ -166,26 +166,35 @@ function lang($arg) {
 }
 
 function template($assign_array, $file) {
-	global $smarty;
-	$path_parts = pathinfo($file);
-	if (substr(strrchr($file, "."), 1) != "tpl") {
-		$tpl_file = 'includes'.substr($path_parts['dirname'], strpos($path_parts['dirname'], 'includes') + 8)."/".basename($path_parts['basename'], '.'.$path_parts['extension']).'.tpl';
-	} else {
-		$tpl_file = $file;
-	}
-	reset_smarty();
-	$smarty->assign($assign_array);
-	
-	// Fetch template directly with Smarty 5.7.0
-	try {
-		$result = $smarty->fetch($tpl_file);
-		return $result;
-	} catch (Exception $e) {
-		// TEMPORARILY show errors instead of hiding them
-		return '<div style="color:red;border:2px solid red;padding:10px;">Template error: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
-	} catch (Error $e) {
-		return '<div style="color:red;border:2px solid red;padding:10px;">PHP Error in template: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
-	}
+       global $smarty, $vars;
+       $path_parts = pathinfo($file);
+       $extension = isset($path_parts['extension']) ? $path_parts['extension'] : '';
+       // Always resolve template path relative to the current theme directory
+       if (strtolower($extension) !== "tpl") {
+	       // e.g. includes/pages/admin/admin_services.php -> includes/pages/admin/admin_services.tpl
+	       $base_name = basename($path_parts['basename'], $extension ? '.'.$extension : '');
+	       if (!isset($path_parts['dirname']) || $path_parts['dirname'] === '.' || $path_parts['dirname'] === '') {
+		       // Plain template name like "html" -> look under includes/html.tpl
+		       $tpl_file = 'includes/' . $base_name . '.tpl';
+	       } else {
+		       $tpl_file = $path_parts['dirname'] . '/' . $base_name . '.tpl';
+		       // Normalize to start from the includes/ directory for theme resolution
+		       $tpl_file = preg_replace('#^.*includes[/\\\\]#', 'includes/', $tpl_file);
+	       }
+	       $tpl_file = str_replace('\\', '/', $tpl_file);
+       } else {
+	       $tpl_file = $file;
+       }
+       reset_smarty();
+       $smarty->assign($assign_array);
+       try {
+	       $result = $smarty->fetch($tpl_file);
+	       return $result;
+       } catch (Exception $e) {
+	       return '<div style="color:red;border:2px solid red;padding:10px;">Template error: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
+       } catch (Error $e) {
+	       return '<div style="color:red;border:2px solid red;padding:10px;">PHP Error in template: ' . htmlspecialchars($e->getMessage()) . '<br>File: ' . htmlspecialchars($tpl_file) . '</div>';
+       }
 }
 
 function reset_smarty() {
@@ -197,13 +206,68 @@ function reset_smarty() {
 	
 	// Use web-relative paths for templates (needed for JavaScript/browser resources)
 	// These paths are relative to the web root, not filesystem paths
-	$tpl_name = isset($vars['templates']['default']) ? $vars['templates']['default'] : 'basic';
+	// Only keep themes that actually exist on disk
+	$available_themes = array_values(array_filter((array)$vars['templates']['available'], function($tpl) use ($vars) {
+		return is_dir($vars['templates']['path'].$tpl.'/');
+	}));
+
+	// Handle explicit theme switch via query param
+	if (isset($_GET['theme'])) {
+		$requested = trim($_GET['theme']);
+		if ($requested !== '' && in_array($requested, $available_themes)) {
+			$_SESSION['theme_override'] = $requested;
+			setcookie('theme_override', $requested, time() + 60*60*24*30, "/");
+		} else {
+			unset($_SESSION['theme_override']);
+			setcookie('theme_override', '', time() - 3600, "/");
+		}
+	}
+
+	// Resolve theme: override > user preference > cookie > default
+	$tpl_name = null;
+	if (isset($_SESSION['theme_override']) && in_array($_SESSION['theme_override'], $available_themes)) {
+		$tpl_name = $_SESSION['theme_override'];
+	} elseif (isset($_SESSION['user_template']) && in_array($_SESSION['user_template'], $available_themes)) {
+		$tpl_name = $_SESSION['user_template'];
+	} elseif (isset($_COOKIE['theme_override']) && in_array($_COOKIE['theme_override'], $available_themes)) {
+		$tpl_name = $_COOKIE['theme_override'];
+	} else {
+		$tpl_name = isset($vars['templates']['default']) ? $vars['templates']['default'] : 'basic';
+	}
+	// Final fallback to first available if chosen theme is missing
+	if (!in_array($tpl_name, $available_themes) && count($available_themes) > 0) {
+		$tpl_name = $available_themes[0];
+	}
+
 	$tpl_web_dir = "templates/".$tpl_name."/";
+	// Point Smarty to the selected theme (with basic fallback)
+	$smarty->setTemplateDir(array(
+		$vars['templates']['path'].$tpl_name.'/',
+		$vars['templates']['path'].'basic/'
+	));
+	// Use per-theme compile dir
+	if (!empty($vars['templates']['compiled_path'])) {
+		$smarty->setCompileDir($vars['templates']['compiled_path'].$tpl_name.'/');
+	}
 	
 	$smarty->assign('tpl_dir', $tpl_web_dir);
 	$smarty->assign('img_dir', $tpl_web_dir."images/");
 	$smarty->assign('css_dir', $tpl_web_dir."css/");
 	$smarty->assign('js_dir', $tpl_web_dir."scripts/javascripts/");
+	$smarty->assign('available_themes', $available_themes);
+	$smarty->assign('current_theme', $tpl_name);
+	
+	// Load site theme setting
+	$site_theme = 'light';
+	$settings_file = ROOT_PATH . "config/site_settings.json";
+	if (file_exists($settings_file)) {
+		$json = file_get_contents($settings_file);
+		$settings = json_decode($json, true);
+		if (isset($settings['theme'])) {
+			$site_theme = $settings['theme'];
+		}
+	}
+	$smarty->assign('site_theme', $site_theme);
 }
 
 function delfile($str) 
@@ -364,7 +428,7 @@ function validate_name_ns($name, $node) {
 }
 
 function is_ip($ip, $full_ip=TRUE) {
-	$ip_ex = explode(".", $ip, 4);
+	$ip_ex = explode(".", $ip ?? '', 4);
 	if ($ip == '') return FALSE;
 	for ($i=0;$i<count($ip_ex);$i++) {
 		if ($i == count($ip_ex)-1 && $ip_ex[$i] == '') continue;

@@ -38,14 +38,14 @@
 		
 	{foreach key=key item=itm from=$data[row]}
 	{assign var="fullkey" value=$data.0.$key}
-	{if $extra_data.HIDE.$fullkey != 'YES'}
+	{if ($extra_data.HIDE.$fullkey|default:'') != 'YES'}
 	{if $smarty.section.row.index == 0 && $lang.db.$itm != ''}
 		{assign var="cell" value=$lang.db.$itm}
 		{assign var="cellclass" value="table-list-top-cell"}
-	{elseif $smarty.section.row.index != 0 && $key|truncate:5:"":true == 'date_'}
+	{elseif $smarty.section.row.index != 0 && $key|substr:0:5 == 'date_'}
 		{assign var="cell" value=$itm|date_format:"%x"}
 		{assign var="cellclass" value="table-list-cell"}
-	{elseif $extra_data.TRANSLATE.$fullkey == 'YES'}
+	{elseif ($extra_data.TRANSLATE.$fullkey|default:'') == 'YES'}
 		{assign var="cellclass" value="table-list-cell"}
 		{assign var="lang_cell" value=$fullkey|cat:"-"|cat:$itm}
 		{assign var="cell" value=$lang.db.$lang_cell}
@@ -61,33 +61,33 @@
 	{assign var=edit_column value=""}
 	{assign var=edit value=""}
 	{assign var=onclick value=""}
-	{if $extra_data.EDIT_COLUMN != ''}
+	{if ($extra_data.EDIT_COLUMN|default:'') != ''}
 		{assign var=edit_column value="`$extra_data.EDIT_COLUMN`"}
 		{assign var=edit value="`$extra_data.EDIT[row]`"}
 	{/if}
-	{if $extra_data.PICKUP_COLUMN != ''}
+	{if ($extra_data.PICKUP_COLUMN|default:'') != ''}
 		{assign var=edit_column value="`$extra_data.PICKUP_COLUMN`"}
 		{assign var=edit value=""}
 		{assign var=onclick value="javascript: window.opener.pickup(window.opener.document.`$extra_data.PICKUP_OBJECT`,'`$extra_data.PICKUP_OUTPUT[row]`','`$extra_data.PICKUP_VALUE[row]`', window); return false;"|stripslashes}
 	{/if}
 	<td class="{$cellclass}">
 		{if $key==$edit_column && $smarty.section.row.index != 0}
-		<a href="{$edit}"{if $extra_data.PICKUP_COLUMN != ''} onclick="{$onclick}"{/if}>
+		<a href="{$edit}"{if ($extra_data.PICKUP_COLUMN|default:'') != ''} onclick="{$onclick}"{/if}>
 		{/if}
-		{if $extra_data.LINK.$fullkey[row] != ''}
+		{if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}
 		<a href="{$extra_data.LINK.$fullkey[row]}">
 		{/if}
 		{$cell|escape}
 		{if $key==$edit_column && $smarty.section.row.index != 0}</a>{/if}
-		{if $extra_data.LINK.$fullkey[row] != ''}
+		{if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}
 		</a>
 		{/if}
 	</td>
 	{/if}
 	{/foreach}
-	{if $extra_data.MULTICHOICE[row] != ''}
-	<td class="table-list-cell-extra"><input class="fld-form-check" type="checkbox" name="id[]" value="{$extra_data.MULTICHOICE[row]|escape}" {if $extra_data.MULTICHOICE_CHECKED[row] == 'YES'}checked="checked" {/if}/></td>
-	{elseif $extra_data.MULTICHOICE_LABEL != ''}
+	{if ($extra_data.MULTICHOICE[row]|default:'') != ''}
+	<td class="table-list-cell-extra"><input class="fld-form-check" type="checkbox" name="id[]" value="{$extra_data.MULTICHOICE[row]|escape}" {if ($extra_data.MULTICHOICE_CHECKED[row]|default:'') == 'YES'}checked="checked" {/if}/></td>
+	{elseif ($extra_data.MULTICHOICE_LABEL|default:'') != ''}
 	<td width="1%" class="table-list-top-cell">{$lang[$extra_data.MULTICHOICE_LABEL]}</td>
 	{/if}
 </tr>

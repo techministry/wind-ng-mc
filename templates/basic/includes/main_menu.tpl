@@ -36,7 +36,7 @@
 					<td class="table-small-menu-text"><a href="{$link_edit_profile}" class="menu-link">{$lang.edit_profile}</a></td>
 				  </tr>-->
 				<tr bgcolor="#FFFFFF">
-					<td class="table-small-menu-text"><a href="{$link_logout}" class="menu-link">{$lang.log_out}</a></td>
+					<td class="table-small-menu-text"><a id="logout-link-basic" href="{$link_logout}" class="menu-link">{$lang.log_out}</a></td>
 				</tr>
 		
 		{else}
@@ -297,3 +297,18 @@
 					
   	{/if}
 </table>
+{literal}
+<script>
+(function() {
+  var link = document.getElementById('logout-link-basic');
+  if (!link) return;
+  link.addEventListener('click', function(e) {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    var url = new URL(link.href, window.location.origin);
+    url.searchParams.set('ts', Date.now());
+    window.location.href = url.toString();
+  });
+})();
+</script>
+{/literal}

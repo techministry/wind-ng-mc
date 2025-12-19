@@ -93,7 +93,11 @@ require_once(ROOT_PATH."vendor/smarty/smarty/src/functions.php");
 require_once(ROOT_PATH."vendor/smarty/smarty/src/Smarty.php");
 
 $smarty = new Smarty\Smarty();
-$smarty->setTemplateDir($vars['templates']['path'].$vars['templates']['default'].'/');
+// Prefer the selected theme but fall back to basic templates if a file is missing
+$smarty->setTemplateDir(array(
+	$vars['templates']['path'].$vars['templates']['default'].'/',
+	$vars['templates']['path'].'basic/'
+));
 $smarty->setCompileDir($vars['templates']['compiled_path'].$vars['templates']['default'].'/');
 $smarty->registerPlugin('modifier', 'stripslashes', 'stripslashes');
 

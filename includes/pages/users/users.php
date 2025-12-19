@@ -35,8 +35,17 @@ class users {
 	
 	function form_user() {
 		global $main, $db, $vars, $lang;
+		// Helper: check if a column exists to stay compatible when DB isn't migrated yet
+		$has_field = function($table, $col) use ($db) {
+			$fields = $db->get_fields($table);
+			foreach ((array)$fields as $f) {
+				if (isset($f['Field']) && $f['Field'] === $col) return TRUE;
+			}
+			return FALSE;
+		};
+		$has_theme = $has_field('users', 'theme');
 		$form_user = new form(array('FORM_NAME' => 'form_user'));
-		$form_user->db_data('users.username, users.password, users.surname, users.name, users.email, users.phone, users.info, users.language');
+		$form_user->db_data('users.username, users.password, users.surname, users.name, users.email, users.phone, users.info, users.language' . ($has_theme ? ', users.theme' : ''));
 		// Hide password...
 		$form_user->data[1]['value'] = '';
 		// ...and show it as required
@@ -50,17 +59,58 @@ class users {
 		foreach($vars['language']['enabled'] as $key => $value) {
 			if ($value) array_push($form_user->data[8]['Type_Enums'], array("value" => $key, "output" => ($lang['languages'][$key]==''?$key:$lang['languages'][$key])));
 		}
+		// Theme preference (per-user), leave empty for default, only if DB supports it
+		if ($has_theme) {
+			$form_user->data[9]['Type'] = 'enum';
+			$form_user->data[9]['Null'] = '';
+			$form_user->data[9]['Type_Enums'][0] = array("value" => "", "output" => $lang['default']);
+			foreach ((array)$vars['templates']['available'] as $tpl) {
+				array_push($form_user->data[9]['Type_Enums'], array("value" => $tpl, "output" => $tpl));
+			}
+		}
 		
 		if (isset($main->userdata->privileges['admin']) && $main->userdata->privileges['admin'] === TRUE) {
 			$form_user->db_data('rights.type, users.status');
-			$form_user->data[9]['Type'] = 'enum_multi';
+			// Locate field indexes dynamically to avoid breakage when columns change
+			$find_idx = function($field) use (&$form_user) {
+				$matches = array();
+				foreach ($form_user->data as $idx => $def) {
+					if ($def['Field'] === $field || $def['fullField'] === $field) {
+						$matches[] = $idx;
+					}
+				}
+				return $matches;
+			};
+			$rights_idx = $find_idx('rights.type');
+			if (isset($rights_idx[0])) {
+				$form_user->data[$rights_idx[0]]['Type'] = 'enum_multi';
+			}
 			$form_user->db_data_values_multi("rights", "user_id", get('user'), 'type');	
 			
 			$form_user->db_data('users_nodes.node_id, users_nodes.node_id');
-			$form_user->data[11]['Field'] = 'node_id_owner';
-			$form_user->data[11]['fullField'] = 'node_id_owner';
-			$form_user->db_data_pickup("node_id_owner", "nodes", $db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner = 'Y'"), TRUE);
-			$form_user->db_data_pickup("users_nodes.node_id", "nodes", $db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner != 'Y'"), TRUE);		
+			$node_idxs = $find_idx('users_nodes.node_id');
+			// First picker: owner
+			if (isset($node_idxs[0])) {
+				$form_user->data[$node_idxs[0]]['Field'] = 'node_id_owner';
+				$form_user->data[$node_idxs[0]]['fullField'] = 'node_id_owner';
+				$form_user->data[$node_idxs[0]]['Type'] = 'pickup';
+				$form_user->db_data_pickup(
+					"node_id_owner",
+					"nodes",
+					$db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner = 'Y'"),
+					TRUE
+				);
+			}
+			// Second picker: co-admin
+			if (isset($node_idxs[1])) {
+				$form_user->data[$node_idxs[1]]['Type'] = 'pickup';
+				$form_user->db_data_pickup(
+					"users_nodes.node_id",
+					"nodes",
+					$db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner != 'Y'"),
+					TRUE
+				);
+			}
 		}
 		
 		$form_user->db_data_values("users", "id", get('user'));
@@ -92,10 +142,11 @@ class users {
 		}
 		if (get('action') == 'logout') {
 			$main->userdata->logout();
+			// Always force immediate redirect after logout to avoid stale state
 			$redirect = get('redirect');
-			$redirect = ($redirect == ""?makelink():$redirect);
-			$main->message->set_fromlang('info', 'logout_success', $redirect);
-			return;
+			$redirect = ($redirect == "" ? makelink(array('page' => 'gmap'), FALSE, FALSE) : $redirect);
+			header("Location: ".html_entity_decode($redirect));
+			exit;
 		}
 		if (get('action') == 'restore') {
 			return $this->restore->output();
@@ -141,6 +192,15 @@ class users {
 		} else {
 			$ins_id = get('user');
 			$a['account_code'] = generate_account_code();
+		}
+		// If the current user updated their own theme, refresh session preference
+		// If the current user updated their own theme and the column exists, refresh session preference
+		if ($ret && $has_theme && isset($main->userdata->user) && $ins_id == $main->userdata->user && isset($_POST['users__theme'])) {
+			if ($_POST['users__theme'] !== '') {
+				$_SESSION['user_template'] = $_POST['users__theme'];
+			} else {
+				unset($_SESSION['user_template']);
+			}
 		}
 		if ($ret && $main->userdata->privileges['admin'] === TRUE) {
 			$ret = $form_user->db_set_multi(array(), "rights", "user_id", get('user'));

@@ -36,6 +36,13 @@ class footer {
 		// Calculate execution times
 		$this->tpl['php_time'] = getmicrotime() - $php_start;
 		$this->tpl['mysql_time'] = isset($db->total_time) ? $db->total_time : 0;
+		// Theme selector data
+		$this->tpl['available_themes'] = isset($vars['templates']['available']) ? $vars['templates']['available'] : array();
+		$this->tpl['current_theme'] = isset($vars['templates']['default']) ? $vars['templates']['default'] : 'basic';
+		if (isset($GLOBALS['smarty'])) {
+			// pick from smarty assigns if present
+			$this->tpl['current_theme'] = $GLOBALS['smarty']->getTemplateVars('current_theme') ?: $this->tpl['current_theme'];
+		}
 		
 		// Add debug link if admin and debug enabled
 		if (isset($main->userdata->privileges['admin']) && $main->userdata->privileges['admin'] === TRUE && isset($vars['debug']['enabled']) && $vars['debug']['enabled'] == TRUE) {

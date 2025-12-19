@@ -27,7 +27,7 @@
 	{if $smarty.section.row.index == 0 && $lang.db.$itm != ''}
 		{assign var="cell" value="`$lang.db.$itm`"}
 		{assign var="cellclass" value="table-node-key2"}
-	{elseif $smarty.section.row.index != 0 && $key|truncate:5:"":true == 'date_'}
+	{elseif $smarty.section.row.index != 0 && $key|substr:0:5 == 'date_'}
 		{assign var="cell" value=$itm|date_format:"%x"}
 		{assign var="cellclass" value="table-node-value2"}
 	{elseif $extra_data.TRANSLATE.$fullkey == 'YES'}

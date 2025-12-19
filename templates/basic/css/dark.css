@@ -1,0 +1,535 @@
+/* Improve table node key/value contrast for dark mode */
+td.table-node-key, td.table-node-key2 {
+    color: #f3f6fa !important; /* Brighter, high-contrast for dark bg */
+    background-color: #22262c !important; /* Slightly lighter than bg-card for subtle separation */
+    font-weight: bold;
+}
+td.table-node-value, td.table-node-value2 {
+    color: #c9d1d9 !important; /* Lighter text for values */
+    background-color: #181b20 !important;
+}
+/* WiND Dark Theme */
+/* This file overrides styles.css for dark mode */
+
+:root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #21262d;
+    --bg-card: #1c2128;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent-primary: #58a6ff;
+    --accent-secondary: #3fb950;
+    --accent-highlight: #1f6feb;
+    --border-color: #30363d;
+    --link-color: #58a6ff;
+    --link-hover: #79c0ff;
+    --success: #3fb950;
+    --warning: #d29922;
+    --error: #f85149;
+    --gradient-header: linear-gradient(180deg, #093668 0%, #0a2540 100%);
+    --gradient-card: linear-gradient(135deg, #1c2128 0%, #21262d 100%);
+    --gradient-button: linear-gradient(180deg, #238636 0%, #2ea043 100%);
+}
+
+html, body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+a:link, a:visited, a:active {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover);
+}
+
+a.menu-link:link, a.menu-link:visited, a.menu-link:active {
+    color: #FFFFFF;
+}
+
+a.menu-link:hover {
+    color: var(--accent-secondary);
+}
+
+/* Main Table */
+.table-main {
+    background-color: var(--bg-primary);
+}
+
+td.table-main-td-middle {
+    border-right: 4px solid #093668;
+}
+
+td.table-main-td-footer {
+    background-color: var(--bg-secondary);
+}
+
+/* Header - Keep original blue gradient to match logo */
+.table-header {
+    background-image: url(../images/header-back.png);
+    background-repeat: repeat-x;
+    background-color: #093668;
+}
+
+/* Middle sections */
+td.table-middle-left-td {
+    border-right: 4px solid #093668;
+    background-color: var(--bg-secondary);
+}
+
+td.main-title {
+    border-bottom-color: #093668;
+    background: var(--gradient-header);
+}
+
+td.main-page {
+    background-color: var(--bg-primary);
+    background-image: none;
+}
+
+td.footer {
+    background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+    background-image: none;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* Quick Login */
+td.quick-login-text {
+    background: linear-gradient(180deg, #1f6feb 0%, #0969da 100%);
+    color: #ffffff;
+}
+
+td.quick-login-title {
+    background-image: none;
+    background: linear-gradient(180deg, #0a2540 0%, #0d1117 100%);
+    color: var(--accent-primary);
+}
+
+td.quick-login-field {
+    background-image: none;
+    background: linear-gradient(180deg, #0a2540 0%, #0d1117 100%);
+}
+
+td.quick-login-submit {
+    background-image: none;
+    background: linear-gradient(180deg, #0a2540 0%, #0d1117 100%);
+}
+
+.btn-login {
+    background: linear-gradient(180deg, #238636 0%, #1a6329 100%);
+    border: 1px solid #238636;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-login:hover {
+    background: linear-gradient(180deg, #2ea043 0%, #238636 100%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.btn-login:active {
+    background: linear-gradient(180deg, #1a6329 0%, #145523 100%);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.fld-quick-login {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 4px;
+}
+
+/* Title - Keep blue gradient matching header/logo */
+td.table-main-title-left,
+td.table-main-title-bullet,
+td.table-main-title-text,
+td.table-main-title-right {
+    background-image: none !important;
+    background: var(--gradient-header) !important;
+    border-bottom: 1px solid #093668;
+    color: var(--text-primary) !important;
+}
+
+/* Left Menu */
+td.table-middle-left-pad {
+    background: linear-gradient(90deg, #093668 0%, #0a4a8f 100%);
+}
+
+.table-small-menu {
+    background-color: var(--bg-secondary);
+}
+
+td.table-small-menu-text {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+    background-image: none !important;
+    background-color: var(--bg-tertiary) !important;
+    border-bottom: 1px solid var(--border-color);
+    color: #FFFFFF;
+}
+
+td.table-search-menu-text {
+    background-image: none;
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.table-mynodes {
+    background-image: none;
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    border-bottom: 1px solid var(--border-color);
+}
+
+td.table-mynodes-title {
+    color: var(--text-primary);
+}
+
+td.table-mynodes-link {
+    color: var(--accent-primary);
+}
+
+/* Content Tables */
+.table-d1 {
+    background: var(--gradient-card);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+td.table-d1-title-text {
+    color: var(--accent-primary);
+    background-color: transparent;
+}
+
+td.table-d1-title-down {
+    background-image: none;
+    background-color: transparent;
+    border-bottom: 1px solid var(--border-color);
+}
+
+td.table-d1-text {
+    background-image: none;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+td.table-d1-text1 {
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+td.table-d1-footer {
+    background-image: none;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Page content */
+td.table-page-pad {
+    color: var(--text-primary);
+}
+
+/* List Tables */
+td.table-list-title {
+    background-image: none;
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+tr.table-list-top {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+}
+
+/* Data table cells */
+td.table-list-top-cell {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: bold;
+}
+
+td.table-list-cell {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tr.table-list-list1 {
+    background-color: var(--bg-card) !important;
+}
+
+tr.table-list-list1 td {
+    background-color: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+}
+
+tr.table-list-list2 {
+    background-color: var(--bg-secondary) !important;
+}
+
+tr.table-list-list2 td {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+td.table-list-footer,
+tr.table-list-footer td {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+    color: var(--text-primary) !important;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Generic table styling for all tables */
+table td {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+table tr:nth-child(odd) td {
+    background-color: var(--bg-card) !important;
+}
+
+table tr:nth-child(even) td {
+    background-color: var(--bg-secondary) !important;
+}
+
+table tr:first-child td {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%) !important;
+    font-weight: bold;
+}
+
+/* Forms */
+.table-form {
+    background: var(--gradient-card);
+    border-radius: 6px;
+}
+
+td.table-form-header,
+td.table-form-title {
+    background-image: none;
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+tr.table-form-row,
+tr.table-form-row0,
+tr.table-form-row1 {
+    background-color: var(--bg-card);
+}
+
+td.table-form-text {
+    color: var(--text-primary);
+    background-color: var(--bg-card);
+}
+
+td.table-form-field {
+    background-color: var(--bg-card);
+}
+
+td.table-form-submit {
+    background-color: var(--bg-card);
+}
+
+/* Input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* Buttons */
+input[type="submit"],
+input[type="button"],
+button,
+.form-submit {
+    background: var(--gradient-button);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover,
+button:hover,
+.form-submit:hover {
+    background: linear-gradient(180deg, #2ea043 0%, #3fb950 100%);
+    box-shadow: 0 4px 12px rgba(46, 160, 67, 0.3);
+}
+
+/* Statistics panel */
+td.stats-title {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    color: var(--accent-primary);
+}
+
+td.stats-text {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+/* Messages */
+.message-info {
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    border-left: 4px solid var(--accent-primary);
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+
+.message-error {
+    background: linear-gradient(135deg, #2d1f1f 0%, #1c1414 100%);
+    border-left: 4px solid var(--error);
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+
+.message-success {
+    background: linear-gradient(135deg, #1f2d1f 0%, #141c14 100%);
+    border-left: 4px solid var(--success);
+    color: var(--text-primary);
+    border-radius: 6px;
+}
+
+/* Map controls */
+.leaflet-container {
+    background-color: var(--bg-primary);
+}
+
+/* Tabs */
+.tab-active {
+    background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+}
+
+.tab-inactive {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bg-tertiary);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-highlight);
+}
+
+/* Additional table styles */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: none;
+}
+
+td, th {
+    border-color: var(--border-color) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Remove white lines between table cells */
+table[border="0"],
+table[cellspacing],
+table[cellpadding] {
+    border: none !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+}
+
+table[border="0"] td,
+table[border="0"] th,
+table[cellspacing] td,
+table[cellspacing] th {
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Fix table backgrounds */
+table[width="100%"] {
+    background-color: var(--bg-primary) !important;
+}
+
+table[width="100%"] td {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Help text */
+.help-text {
+    color: var(--text-muted);
+}
+
+/* Node status colors */
+.status-active {
+    color: var(--success);
+}
+
+.status-inactive {
+    color: var(--error);
+}
+
+.status-pending {
+    color: var(--warning);
+}
+
+/* Title styling */
+.title2 {
+    color: var(--accent-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+/* Horizontal rules */
+hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 20px 0;
+}

@@ -21,9 +21,22 @@
 <style>
 #map { min-height: calc(100vh - 150px); }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%;">
 {if $gmap_key_ok}
 <div id="map" style="width: 100%; height: calc(100vh - 150px);"></div>
+<script type="text/javascript">
+{literal}
+window.onload = function() {
+	var map = L.map('map').setView([38, 23], 8);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; OpenStreetMap contributors'
+	}).addTo(map);
+};
+{/literal}
+</script>
 {else}
 {$lang.message.error.gmap_key_failed.body|wordwrap:40|nl2br}
 {/if}

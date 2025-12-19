@@ -40,6 +40,25 @@ class header {
 		} else {
 			$this->tpl['mylogo'] = FALSE;
 		}
+
+		// Expose login info to the header template (used for profile/logout buttons)
+		$this->tpl['logged'] = isset($main->userdata->logged) ? $main->userdata->logged : false;
+		$this->tpl['logged_username'] = isset($main->userdata->info['username']) ? $main->userdata->info['username'] : '';
+		// Build clean links (no merged query string) and force a redirect after logout
+		$this->tpl['link_logged_profile'] = makelink(array("page" => "users", "user" => $main->userdata->user), FALSE, FALSE);
+		$this->tpl['link_logout'] = makelink(array(
+			"page" => "users",
+			"action" => "logout",
+			"redirect" => '?page=gmap',
+			// Add a cache-busting token so proxies/browsers don't reuse an old request
+			"ts" => time()
+		), FALSE, FALSE);
+
+		// Provide login form for unauthenticated users
+		if (!$this->tpl['logged']) {
+			$form_login = $main->menu->form_login();
+			$this->tpl['form_login'] = $construct->form($form_login, 'constructors/form.tpl');
+		}
 		
 		// Use template() to render the header template
 		try {

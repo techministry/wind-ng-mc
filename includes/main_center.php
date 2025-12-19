@@ -41,6 +41,10 @@ class center {
 	
 	function security_check() {
 		global $main, $db;
+		// Debug: Log privileges check
+		error_log("security_check: logged=" . var_export($main->userdata->logged, true) . 
+			", user=" . var_export($main->userdata->user, true) . 
+			", privileges=" . print_r($main->userdata->privileges, true));
 		if (isset($main->userdata->privileges['admin']) && $main->userdata->privileges['admin'] === TRUE) {
 			return TRUE;
 		}

@@ -52,6 +52,7 @@ class menu {
 				}
 		#@#
 		$main->html->body->tpl['link_logged_profile'] = makelink(array("page" => "users", "user" => $main->userdata->user));
+		$main->html->body->tpl['link_logout'] = makelink(array("page" => "users", "action" => "logout", "ts" => time()));
 		$main->html->body->tpl['logged'] = $main->userdata->logged;
 		//dump($main->html->body->tpl);
 		foreach($vars['language']['enabled'] as $key => $value) {
@@ -65,9 +66,16 @@ class menu {
 			$this->tpl = array_merge_check($this->tpl, $main->userdata->info);
 			$this->tpl['mynodes'] = $db->get('nodes.id, nodes.name', 'nodes INNER JOIN users_nodes ON nodes.id = users_nodes.node_id', "users_nodes.user_id = '".$main->userdata->user."'");
 			#@#
-			$this->tpl['home_node'] = $db->get('nodes.id, nodes.name', 'nodes INNER JOIN users_nodes ON nodes.id = users_nodes.node_id', "nodes.id = '".$main->userdata->home_node."'");			
-			$this->tpl['home_node'][0]['url'] = makelink(array("page" => "mynodes", "node" => $this->tpl['home_node'][0]['id']));
-			$this->tpl['home_node'][0]['url_view'] = makelink(array("page" => "nodes", "node" => $this->tpl['home_node'][0]['id']));
+			$home_node_id = isset($main->userdata->home_node) ? $main->userdata->home_node : '';
+			if ($home_node_id) {
+				$this->tpl['home_node'] = $db->get('nodes.id, nodes.name', 'nodes INNER JOIN users_nodes ON nodes.id = users_nodes.node_id', "nodes.id = '".$home_node_id."'");
+				if (!empty($this->tpl['home_node'][0]['id'])) {
+					$this->tpl['home_node'][0]['url'] = makelink(array("page" => "mynodes", "node" => $this->tpl['home_node'][0]['id']));
+					$this->tpl['home_node'][0]['url_view'] = makelink(array("page" => "nodes", "node" => $this->tpl['home_node'][0]['id']));
+				}
+			} else {
+				$this->tpl['home_node'] = array();
+			}
 			#@#
 			foreach( (array) $this->tpl['mynodes'] as $key => $value) {
 				$this->tpl['mynodes'][$key]['url'] = makelink(array("page" => "mynodes", "node" => $this->tpl['mynodes'][$key]['id']));
@@ -87,7 +95,7 @@ class menu {
 				$this->tpl['link_admin_actionlog'] = makelink(array('page' => 'admin', 'subpage' => 'actionlog'));
 				$this->tpl['link_admin_site'] = makelink(array('page' => 'admin', 'subpage' => 'site'));
 			}
-			if ($main->userdata->privileges['cadmin'] === TRUE) {
+			if (isset($main->userdata->privileges['cadmin']) && $main->userdata->privileges['cadmin'] === TRUE) {
 				$this->tpl['is_admin'] = TRUE;
 				$this->tpl['link_admin_areas'] = makelink(array('page' => 'admin', 'subpage' => 'areas'));
 				$this->tpl['link_admin_nodes'] = makelink(array("page" => "admin", "subpage" => "nodes"));
@@ -134,7 +142,7 @@ class menu {
 		$this->tpl['link_alldnszones'] = makelink(array("page" => "dnszones"));
 		$this->tpl['link_restore_password'] = makelink(array("page" => "users", "action" => "restore"));
 		$this->tpl['link_register'] = makelink(array("page" => "users", "user" => "add"));
-		$this->tpl['link_logout'] = makelink(array("page" => "users", "action" => "logout"));
+		$this->tpl['link_logout'] = makelink(array("page" => "users", "action" => "logout", "ts" => time()));
 		parse_str(substr(makelink(array("page" => "search"), FALSE, TRUE, FALSE), 1), $this->tpl['query_string']);
 		
 		// Stats: nodes with any links (connected to network)
@@ -168,7 +176,7 @@ class menu {
 						'nodes_services',
 						''
 						);
-		$main->html->head->add_script("text/javascript", makelink(array("page" => "search", "subpage" => "suggest_js")));
+		$main->html->head->add_script("text/javascript", makelink(array("page" => "search", "subpage" => "suggest_js"), FALSE, TRUE, FALSE));
 		// Use template() to render the menu template
 		try {
 			return template($this->tpl, __FILE__);
@@ -188,7 +196,9 @@ class menu {
 				$main->message->set_fromlang('info', 'activation_required');
 				$main->userdata->logout();
 			} else {
-				$main->message->set_fromlang('info', 'login_success', makelink());
+				// Force an immediate refresh of the current page after login
+				header("Location: ".html_entity_decode(makelink(array(), FALSE, FALSE)));
+				exit;
 			}
 		} else {
 			$main->message->set_fromlang('error', 'login_failed', makelink("", TRUE));

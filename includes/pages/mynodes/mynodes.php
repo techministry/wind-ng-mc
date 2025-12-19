@@ -39,7 +39,7 @@ class mynodes {
 		global $db, $main;
 		
 		#@# community admin
-		if ($main->userdata->privileges['cadmin']===TRUE) {
+		if (isset($main->userdata->privileges['cadmin']) && $main->userdata->privileges['cadmin']===TRUE) {
 		$q="SELECT
 		communities.admins
 		FROM
@@ -88,14 +88,14 @@ class mynodes {
 		if (get('node') != 'add') {
 				$form_node->db_data_pickup("users_nodes.user_id", "users", $db->get("users.id AS value, users.username AS output", "users_nodes, users", "users.id = users_nodes.user_id AND users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner != 'Y'"), TRUE);
 			} else {
-				$form_node->db_data_pickup("users_nodes.user_id", "users", null, TRUE);
+				   $form_node->db_data_pickup("users_nodes.user_id", "users", array(), TRUE);
 			}
 			#$form_node->data[1]['Null'] = 'YES';
 		}
 
-		if ($main->userdata->privileges['admin'] === TRUE) $form_node->db_data('nodes.id, nodes.name_ns');
+		if (isset($main->userdata->privileges['admin']) && $main->userdata->privileges['admin'] === TRUE) $form_node->db_data('nodes.id, nodes.name_ns');
 		#$#
-		if ($main->userdata->privileges['cadmin'] === TRUE) $form_node->db_data('nodes.name_ns');
+		if (isset($main->userdata->privileges['cadmin']) && $main->userdata->privileges['cadmin'] === TRUE) $form_node->db_data('nodes.name_ns');
 		#$#
 		$form_node->db_data_enum('nodes.area_id', $db->get("id AS value, name AS output", "areas","","","name"));#@#*** // changes output
 		#DOC: ($select, $from, $where, $group_by, $order_by, $limit)
