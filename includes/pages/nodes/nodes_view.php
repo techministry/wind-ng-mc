@@ -318,13 +318,8 @@ class nodes_view {
 		global $construct, $db, $vars, $main;
 		$this->tpl['logged'] = $main->userdata->logged;#@#
 		#$main->html->body->tpl['logged'] = $main->userdata->logged;#@#
-		if ($db->cnt('',
-					'nodes ' .
-					'INNER JOIN users_nodes ON users_nodes.node_id = nodes.id ' .
-					'INNER JOIN users ON users_nodes.user_id = users.id',
-					"nodes.id = ".intval(get('node')).
-					' AND users.status = "activated"')
-			 == 0) {
+		// Allow viewing any existing node; don't require an activated owner
+		if ($db->cnt('', 'nodes', "nodes.id = ".intval(get('node'))) == 0) {
 			$main->message->set_fromlang('error', 'node_not_found');
 			return;
 		}

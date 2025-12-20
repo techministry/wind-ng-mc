@@ -89,27 +89,33 @@ class users {
 			
 			$form_user->db_data('users_nodes.node_id, users_nodes.node_id');
 			$node_idxs = $find_idx('users_nodes.node_id');
+			$all_nodes = $db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "nodes", "", "", "nodes.name ASC");
 			// First picker: owner
 			if (isset($node_idxs[0])) {
 				$form_user->data[$node_idxs[0]]['Field'] = 'node_id_owner';
 				$form_user->data[$node_idxs[0]]['fullField'] = 'node_id_owner';
+				$form_user->data[$node_idxs[0]]['Field_Text'] = $lang['node'].' (owner, admin only)';
 				$form_user->data[$node_idxs[0]]['Type'] = 'pickup';
-				$form_user->db_data_pickup(
-					"node_id_owner",
-					"nodes",
-					$db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner = 'Y'"),
-					TRUE
-				);
+				$form_user->db_data_pickup("node_id_owner", "nodes", $all_nodes, TRUE);
 			}
 			// Second picker: co-admin
 			if (isset($node_idxs[1])) {
 				$form_user->data[$node_idxs[1]]['Type'] = 'pickup';
-				$form_user->db_data_pickup(
-					"users_nodes.node_id",
-					"nodes",
-					$db->get("nodes.id AS value, CONCAT(nodes.name, ' (#', nodes.id, ')') AS output", "users_nodes, nodes", "nodes.id = users_nodes.node_id AND users_nodes.user_id = '".get('user')."' AND users_nodes.owner != 'Y'"),
-					TRUE
-				);
+				$form_user->data[$node_idxs[1]]['Field_Text'] = $lang['node'].' (co-admin, admin only)';
+				$form_user->db_data_pickup("users_nodes.node_id", "nodes", $all_nodes, TRUE);
+			}
+			// Pre-select existing owner/co-admin nodes
+			if (isset($node_idxs[0])) {
+				$owners = $db->get("node_id", "users_nodes", "user_id = '".get('user')."' AND owner = 'Y'");
+				foreach ((array)$owners as $row) {
+					$form_user->data[$node_idxs[0]]['value'][$row['node_id']] = "YES";
+				}
+			}
+			if (isset($node_idxs[1])) {
+				$coadmins = $db->get("node_id", "users_nodes", "user_id = '".get('user')."' AND owner != 'Y'");
+				foreach ((array)$coadmins as $row) {
+					$form_user->data[$node_idxs[1]]['value'][$row['node_id']] = "YES";
+				}
 			}
 		}
 		
@@ -120,6 +126,18 @@ class users {
 
 	function output() {
 		global $main, $construct, $db;
+		// Admin-only impersonation hook
+		if (get('action') === 'impersonate' && $main->userdata->privileges['admin'] === TRUE && get('user') !== '' && get('user') !== 'add') {
+			// Remember who impersonated, so they can log back if needed
+			$_SESSION['impersonator'] = $main->userdata->user;
+			$_SESSION['userdata'][$main->userdata->primary_key] = get('user');
+			$main->userdata->logged = TRUE;
+			$main->userdata->user = get('user');
+			$main->userdata->load_info();
+			$main->message->set('Info', 'Now impersonating user #'.get('user'));
+			header("Location: ".html_entity_decode(makelink(array(), FALSE, FALSE)));
+			exit;
+		}
 		if(get('action') === "delete" && $main->userdata->privileges['admin'] === TRUE)
 		{
 			$ret = $db->del("users", '', "id = '".get('user')."'");
@@ -144,7 +162,7 @@ class users {
 			$main->userdata->logout();
 			// Always force immediate redirect after logout to avoid stale state
 			$redirect = get('redirect');
-			$redirect = ($redirect == "" ? makelink(array('page' => 'gmap'), FALSE, FALSE) : $redirect);
+			$redirect = ($redirect == "" ? makelink(array(), FALSE, FALSE) : $redirect);
 			header("Location: ".html_entity_decode($redirect));
 			exit;
 		}
@@ -156,7 +174,34 @@ class users {
 			$this->tpl['user_method'] = (get('user') == 'add' ? 'add' : 'edit');
 			if(get('user') != 'add' && $main->userdata->privileges['admin'] === TRUE)
 				$this->tpl['link_user_delete'] = makelink(array("action" => "delete"),TRUE);
+			if (get('user') != 'add' && $main->userdata->privileges['admin'] === TRUE) {
+				$this->tpl['link_impersonate'] = makelink(array("action" => "impersonate"), TRUE);
+			}
 			$this->tpl['form_user'] = $construct->form($this->form_user(), __FILE__);
+			// Show nodes where this user is owner/admin or co-admin
+			if (get('user') != 'add') {
+				$this->tpl['nodes_owner'] = $db->get(
+					"nodes.id, nodes.name",
+					"nodes INNER JOIN users_nodes ON users_nodes.node_id = nodes.id",
+					"users_nodes.user_id = '".get('user')."' AND users_nodes.owner = 'Y'",
+					"",
+					"nodes.name ASC"
+				);
+				$this->tpl['nodes_coadmin'] = $db->get(
+					"nodes.id, nodes.name",
+					"nodes INNER JOIN users_nodes ON users_nodes.node_id = nodes.id",
+					"users_nodes.user_id = '".get('user')."' AND users_nodes.owner != 'Y'",
+					"",
+					"nodes.name ASC"
+				);
+				// Build links for convenience
+				foreach ((array)$this->tpl['nodes_owner'] as $idx => $row) {
+					$this->tpl['nodes_owner'][$idx]['url_view'] = makelink(array('page' => 'nodes', 'node' => $row['id']));
+				}
+				foreach ((array)$this->tpl['nodes_coadmin'] as $idx => $row) {
+					$this->tpl['nodes_coadmin'][$idx]['url_view'] = makelink(array('page' => 'nodes', 'node' => $row['id']));
+				}
+			}
 		}
 		return template($this->tpl, __FILE__);
 	}

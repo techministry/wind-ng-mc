@@ -135,7 +135,8 @@ class menu {
 			}
 		}
 		$this->tpl['link_home'] = makelink(array());
-		$this->tpl['link_allnodes'] = makelink(array("page" => "nodes"));
+		// Avoid carrying stale query params (e.g., node=...) when listing all nodes
+		$this->tpl['link_allnodes'] = makelink(array("page" => "nodes"), FALSE, FALSE);
 		$this->tpl['link_allranges'] = makelink(array("page" => "ranges", "subpage" => "search"));
 		$this->tpl['link_allservices'] = makelink(array("page" => "services"));
 		$this->tpl['link_communities'] = makelink(array("page" => "communities"));

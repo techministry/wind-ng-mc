@@ -164,24 +164,25 @@ function gmap_reload() {
 }
 
 function gmap_refresh() {
+	// Always refetch data; clear existing overlays
 	reset_markers();
+	markerClusterGroup.clearLayers();
+	for (var pid in polylines) {
+		if (polylines[pid]) map.removeLayer(polylines[pid]);
+	}
+	polylines = {};
+	selected = [];
+	p2p_ap = [];
+	p2p = [];
+	aps = [];
+	clients = [];
+	unlinked = [];
+	links_p2p = [];
+	links_client = [];
 	var ch_p2p = document.getElementsByName("p2p")[0];
 	var ch_aps = document.getElementsByName("aps")[0];
 	var ch_clients = document.getElementsByName("clients")[0];
 	var ch_unlinked = document.getElementsByName("unlinked")[0];
-	if (((ch_p2p.checked == true && p2p.length > 0) || ch_p2p.checked == false) &&
-		((ch_aps.checked == true && aps.length > 0) || ch_aps.checked == false) &&
-		((ch_clients.checked == true && clients.length > 0) || ch_clients.checked == false) &&
-		((ch_unlinked.checked == true && unlinked.length > 0) || ch_unlinked.checked == false)) {
-			markerClusterGroup.clearLayers();
-			markers = {};
-			for (var pid in polylines) {
-				if (polylines[pid]) map.removeLayer(polylines[pid]);
-			}
-			polylines = {};
-			gmap_reload();
-			return;
-	}
 	
 	// Use modern XMLHttpRequest
 	var request = new XMLHttpRequest();
@@ -296,21 +297,18 @@ function getNumberedIcon(number) {
 }
 
 function makeMarkers(nodes, icon_image, icon_zoom) {
-	var bounds = map.getBounds();
 	for (var i = 0; i < nodes.length; i++) {
 		var node_name = nodes[i].getAttribute("name");
 		var node_community = nodes[i].getAttribute("community") || "Not set";
 		var node_id = nodes[i].getAttribute("id");
-		var node_lat = nodes[i].getAttribute("lat");
-		var node_lon = nodes[i].getAttribute("lon");
+		var node_lat = parseFloat(nodes[i].getAttribute("lat"));
+		var node_lon = parseFloat(nodes[i].getAttribute("lon"));
 		var node_url = nodes[i].getAttribute("url");
 
 		if (markers[node_id] != undefined) continue;
+		if (!isFinite(node_lat) || !isFinite(node_lon)) continue;
 
 		var point = L.latLng(node_lat, node_lon);
-		var inbounds = bounds.contains(point);
-
-		if (inbounds) {
 			var node_area = nodes[i].getAttribute("area");
 			var node_freeifs = nodes[i].getAttribute("freeifs");
 			var node_adminowner = nodes[i].getAttribute("adminowner");

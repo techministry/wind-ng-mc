@@ -34,6 +34,8 @@
 <tr>
 <td class="table-page-pad">
 {include assign="t2" file="generic/link.tpl" content="`$lang.find_coordinates`" onclick="javascript: t = window.open('$link_gmap_pickup', 'popup_gmap_pickup', 'width=500,height=500,toolbar=0,resizable=0,scrollbars=0'); t.focus(); return false;"}
+{if $node_owner_display ne ''}<div style="padding:6px 0;font-weight:bold;">{$lang.adminowner}: {$node_owner_display|escape}</div>{/if}
+{if $node_coadmins_display ne ''}<div style="padding:0 0 6px 0;font-weight:bold;">{$lang.coadmins}: {$node_coadmins_display|escape}</div>{/if}
 {include file="generic/title1.tpl" title="`$lang.node_info` $t2" right="$view $t1" content=$form_node}
 </td>
 </tr>

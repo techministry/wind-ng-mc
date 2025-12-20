@@ -181,7 +181,7 @@
 <tr>
 <td colspan="2" class="table-page-pad">
 {if $logged==TRUE}
-{include file="generic/title2.tpl" title="Logs" content=$t}
+{include file="generic/title2.tpl" title="Logs" content=$table_logs|default:"No logs available"}
 {else}{$lang.adpl}{/if}
 </td>
 </tr>

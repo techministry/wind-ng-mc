@@ -62,34 +62,17 @@ class communities {
 				}
 				
 				$cadmins = explode(",",$table_communities->data[$key]['admins']);
-				#print_r($cadmins);echo "admins<br>";
-					foreach ($cadmins as $key_name => $key_value) {
-						 $i++;
-					    #print_r($key_value);
-						
-						$queryusers= $db->query("SELECT
-									users.username
-									FROM
-									users
-									WHERE
-									users.id =  '$key_value'
-									");
-						$usernames = mysql_fetch_assoc($queryusers);
-						#echo $usernames['username'];
-						$cadmins[$key_name]=$usernames['username'];
-						#echo $cadmins[$key_name];
-						#print_r($usernames);
-						
-						#$cadmins[$key_name]=$usernames[$i];#echo "users:$key_name:$key_value<br>"; print_r($usernames);
-						#$new=implode(",",$usernames);
-						#$basket = array_replace_recursive($base, $replacements);print_r($basket);
-						
-						#$usernames_comma_separated = implode(",", $usernames);
-						#$basket = array_combine($cadmins, $usernames);print_r($basket);
-					}
-					
-					#$basket = array_combine($cadmins, $usernames);print_r($basket);
-		    		$table_communities->data[$key]['admins']=implode(", ",$cadmins);
+				$admin_links = array();
+				foreach ($cadmins as $key_name => $key_value) {
+					$uid = trim($key_value);
+					if ($uid === '') continue;
+					$user_row = $db->get("username", "users", "id = '".$db->escape_string($uid)."'");
+					$username = isset($user_row[0]['username']) ? $user_row[0]['username'] : ('#'.$uid);
+					$link = makelink(array("page" => "users", "user" => $uid));
+					$admin_links[] = '<a href="'.$link.'">'.htmlspecialchars($username).'</a>';
+				}
+				$table_communities->data[$key]['admins'] = implode(", ", $admin_links);
+				$table_communities->info['RAW']['communities__admins'] = 'YES';
 					
 					#		$cadmins->data[$k]['links__ip'] = $cadmins->data[$k]['links__ip'];#@#
 					

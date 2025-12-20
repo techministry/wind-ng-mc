@@ -39,6 +39,10 @@ class nodes_plot {
 	
 	function output() {
 		global $db, $geoimage;
+		// Ensure helper is available (can be null if include failed earlier)
+		if (!$geoimage instanceof geoimage) {
+			$geoimage = new geoimage();
+		}
 		$a_node = $db->get('latitude, longitude, elevation', 'nodes', "id = '".get('a_node')."'");
 		$b_node = $db->get('latitude, longitude, elevation', 'nodes', "id = '".get('b_node')."'");
 		$width = (integer)$_GET['width'];

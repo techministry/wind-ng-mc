@@ -77,7 +77,11 @@
 		{if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}
 		<a href="{$extra_data.LINK.$fullkey[row]}">
 		{/if}
-		{$cell|escape}
+		{if ($extra_data.RAW.$fullkey|default:'') == 'YES'}
+			{$cell nofilter}
+		{else}
+			{$cell|escape}
+		{/if}
 		{if $key==$edit_column && $smarty.section.row.index != 0}</a>{/if}
 		{if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}
 		</a>

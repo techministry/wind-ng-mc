@@ -3,7 +3,7 @@
  * WiND - Wireless Nodes Database
  *
  * Copyright (C) 2005 Nikolaos Nikalexis <winner@cube.gr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 2 dated June, 1991.
@@ -19,29 +19,109 @@
  *
  */
 
+function mybb_login($username, $password_md5) {
+	global $db;
+	// Check user password
+
+	// Banned groups
+	$banned_usergroups = array(5,7);
+	// Table prefix
+	$table_prefix = "wnagr_mybb4.mybb_";
+
+	// Get user info (cross-database table prefix supported)
+	$data = $db->get("username,password,salt,usergroup", "{$table_prefix}users", "username = '" . $db->escape_string($username) . "'");
+	$data = isset($data[0]) ? $data[0] : array();
+
+	if (!isset($data['username']) || !isset($data['password']) || !isset($data['salt'])) {
+		return false;
+	}
+
+	$saltedpw = md5(md5($data['salt']).$password_md5);
+	if($data['username'] && $data['password'] == $saltedpw)
+	{
+		if(in_array($data['usergroup'], $banned_usergroups))
+		{
+			return false;
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+	return false;
+}
+
+function mybb_sync_db($username, $password_md5) {
+	global $db, $main;
+	// Synchronize 2 databases
+
+	// Banned groups
+	$banned_usergroups = array(5,7);
+	// Table prefix
+	$table_prefix = "wnagr_mybb4.mybb_";
+
+	// Get MyBB User info
+	$mybb = $db->get("username,usergroup,email", "{$table_prefix}users", "username = '" . $db->escape_string($username) . "'");
+	$data = isset($mybb[0]) ? $mybb[0] : array();
+
+ 	// Find pre-existing user on WiND database
+	$local = $db->get("id", "users", "username = '" . $db->escape_string($data['username']) . "'");
+	$localinfo = isset($local[0]) ? $local[0] : array();
+
+	// If not exists, then update the query
+	if (!$localinfo) {
+		// Elseways, insert a new entry
+		$code = generate_account_code();
+		$db->add("users", array(
+			"username" => $data['username'],
+			"password" => $password_md5,
+			"surname" => '',
+			"name" => '',
+			"phone" => '',
+			"email" => $data['email'],
+			"info" => '',
+			"account_code" => $code,
+			"status" => 'activated'
+		));
+		$main->userdata->logged = true;
+	} else {
+		$db->set("users", array(
+			"username" => $data['username'],
+			"password" => $password_md5,
+			"email" => $data['email'],
+			"status" => 'activated'
+		), "id = '" . $db->escape_string($localinfo['id']) . "'", FALSE);
+	}
+	// wavesoft: hotspot sync
+	//include_once "/home/wnagr/public_html/radcp/scripts/lib.hotspotfunc.php";
+	// wavesoft; Sync User/Password
+	//sync_user_pwd($username, $password_md5); -wrong pass -> to metafero sto forum
+
+
+}
+
 class userdata {
-	
+
 	var $logged=FALSE;
 	var $user='';
-	var $info = array();
+	var $info;
 	var $privileges = array();
-	
+
 	#CONFIG
 	var $users_table = "users";
 	var $primary_key = "id";
 	var $username_key = "username";
 	var $password_key = "password";
-	var $info_keys = "username, name, surname, date_in, last_visit, last_session, status, language, theme";
+	var $info_keys = "username, name, surname, date_in, last_visit, last_session, status, language";
 	var $last_session_key = "last_session";
 	var $last_visit_key = "last_visit";
-	
-	function __construct() {
+
+	function __construct() { $this->userdata(); } // PHP 7/8 constructor wrapper
+
+	function userdata() {
 		session_start();
-		// Short-circuit auto login if this request is explicitly logging out
-		if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-			$this->logout();
-			return;
-		}
 		if (isset($_SESSION['userdata'][$this->primary_key])) {
 			$this->logged = TRUE;
 			$this->user = $_SESSION['userdata'][$this->primary_key];
@@ -60,42 +140,31 @@ class userdata {
 					$this->logged = FALSE;
 				}
 			} else {
-				$this->logged = FALSE;			
+				$this->logged = FALSE;
 			}
 		}
 		$this->load_info();
 	}
-	
+
 	function load_info() {
 		if ($this->logged) {
 			global $db;
 			$get_res = $db->get($this->info_keys, $this->users_table, $this->primary_key." = '$this->user'");
-			// Fallback if custom columns are missing (e.g., theme not migrated yet)
-			if (!$get_res || !isset($get_res[0])) {
-				$get_res = $db->get("username, name, surname, date_in, last_visit, last_session, status, language", $this->users_table, $this->primary_key." = '$this->user'");
-			}
-			$this->info = isset($get_res[0]) ? $get_res[0] : array();
-			
+			$this->info = $get_res[0];
+
 			// EDIT HERE
-			$get_res = $db->get('type', 'rights', "user_id = '$this->user'");		
+			$get_res = $db->get('type', 'rights', "user_id = '$this->user'");
 			foreach( (array) $get_res as $key => $value) {
 				$this->privileges[$value['type']] = TRUE;
 			}
 			//
-			// Cache per-user template preference in session for the current request
-			if (isset($this->info['theme']) && $this->info['theme'] !== '') {
-				$_SESSION['user_template'] = $this->info['theme'];
-			} else {
-				unset($_SESSION['user_template']);
-			}
-			
+
 		} else {
 			unset($this->info);
-			unset($this->privileges);
-			unset($_SESSION['user_template']);
+			$this->privileges = array();
 		}
 	}
-	
+
 	function login($username, $password, $save = FALSE) {
 		$this->logout();
 		if ($this->check_login($username, md5($password))) {
@@ -115,39 +184,34 @@ class userdata {
 		$this->load_info();
 		return $this->logged;
 	}
-	
+
 	function logout() {
 		if ($this->logged) {
-			// Clear persistent cookies immediately
-			@setcookie('userdata['.$this->primary_key.']', '', time() - 3600, "/");
-			@setcookie('userdata['.$this->password_key.']', '', time() - 3600, "/");
-			// Reset session state
-			$_SESSION = array();
-			if (session_id() !== '' || isset($_COOKIE[session_name()])) {
-				@setcookie(session_name(), '', time() - 3600, "/");
-			}
-			session_destroy();
+			cookie('userdata['.$this->primary_key.']', '');
+			cookie('userdata['.$this->password_key.']', '');
 			$this->logged = FALSE;
 			$this->user = '';
-		} else {
-			// Also clear stray cookies even if we think we're logged out
-			@setcookie('userdata['.$this->primary_key.']', '', time() - 3600, "/");
-			@setcookie('userdata['.$this->password_key.']', '', time() - 3600, "/");
+			session_destroy();
 		}
-		unset($_SESSION['user_template']);
 		$this->load_info();
 	}
-	
+
 	function check_login($username, $password, $user_pk = FALSE) {
 		global $db;
-		$get_res = $db->get($this->password_key, $this->users_table, ($user_pk?$this->primary_key:$this->username_key)." = '$username'");
-		if (isset($get_res[0][$this->password_key]) && $password == $get_res[0][$this->password_key]) {
+
+		if (mybb_login($username, $password)) {
+			mybb_sync_db($username, $password);
 			return TRUE;
 		} else {
-			return FALSE;
+			$get_res = $db->get($this->password_key, $this->users_table, ($user_pk?$this->primary_key:$this->username_key)." = '$username'");
+			if (isset($get_res[0][$this->password_key]) && $password == $get_res[0][$this->password_key]) {
+				return TRUE;
+			} else {
+				return FALSE;
+			}
 		}
 	}
-	
+
 	function reset_visit($uid="") {
 		if ($uid == "") $uid = $this->user;
 		global $db;
@@ -155,7 +219,7 @@ class userdata {
 		$ret = $ret[0];
 		$db->set($this->users_table, array($this->last_visit_key => $ret[$this->last_session_key]), $this->primary_key." = '$uid'", FALSE);
 	}
-	
+
 	function refresh_session($uid="") {
 		if ($uid == "") $uid = $this->user;
 		global $db;

@@ -92,3 +92,7 @@
     {/if}
   </div>
 </div>
+
+<div id="tab_view" class="card elevation-2" style="margin-bottom:24px;">
+  {include file="includes/pages/nodes/myview.tpl"}
+</div>

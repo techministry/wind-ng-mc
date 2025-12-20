@@ -20,9 +20,8 @@
  *
  */
 
-// Suppress PHP notices and warnings from displaying in output
-// They will still be logged to error_log
-error_reporting(E_ALL);
+// Suppress PHP notices from rendering (keep logging)
+error_reporting(E_ALL & ~E_NOTICE);
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 

@@ -81,9 +81,9 @@ class nodes_search {
 			LEFT JOIN links AS cl ON cl.peer_ap_id = aps.id
 								  AND cl.type = "client"
 								  AND cl.status = "active"
-			INNER JOIN users_nodes ON nodes.id = users_nodes.node_id 
+			LEFT JOIN users_nodes ON nodes.id = users_nodes.node_id 
 			LEFT JOIN users ON users.id = users_nodes.user_id',
-			'users.status = "activated"'.
+			'1'.
 			($where!=''?' AND ('.$where.')':""),
 			'nodes.id'.
 			($having!=''?' HAVING ('.$having.')':""),
@@ -107,10 +107,11 @@ class nodes_search {
 		$this->tpl['form_search_nodes'] = $construct->form($this->form_search_nodes(), __FILE__);
 		$this->tpl['table_nodes'] = $construct->table($this->table_nodes(), __FILE__);
 
-		$this->tpl['link_fullmap'] = makelink(array("page" => "gmap", "node" => get('node')));
-		$this->tpl['link_gearth'] = makelink(array("page" => "gearth", "subpage" => "download", "node" => get('node'), "show_p2p" => "1", "show_aps" => "1", "show_clients" => "1", "show_unlinked" => "1", "show_links_p2p" => "1", "show_links_client" => "1"));
+		// Always link to the full map without preselecting a node
+		$this->tpl['link_fullmap'] = makelink(array("page" => "gmap"));
+		$this->tpl['link_gearth'] = makelink(array("page" => "gearth", "subpage" => "download", "show_p2p" => "1", "show_aps" => "1", "show_clients" => "1", "show_unlinked" => "1", "show_links_p2p" => "1", "show_links_client" => "1"));
 		if(get('show_map') == "no") $this->tpl['gmap_key_ok'] = "nomap";
-		else $this->tpl['gmap_key_ok'] = include_gmap("?page=gmap&subpage=js&node=".get('node'));
+		else $this->tpl['gmap_key_ok'] = include_gmap("?page=gmap&subpage=js");
 
 		return template($this->tpl, __FILE__);
 	}

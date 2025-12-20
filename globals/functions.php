@@ -137,7 +137,7 @@ function query_str($params) {
 
 function cookie($name, $value) {
 	global $vars;
-	$expire = time() + $vars['cookies']['expire'];
+	$expire = time() + (isset($vars['cookies']['expire']) ? $vars['cookies']['expire'] : 3600);
 	return setcookie($name, $value, $expire, "/");
 }
 
@@ -588,8 +588,8 @@ function log_admin_action()
 		"uid" => $uid,
 		"ipaddress" => get_ip(),
 		"dateline" => date("Y-m-d H:i:s"),
-		"page" => get(page),
-		"action" => get(subpage),
+		"page" => get('page'),
+		"action" => get('subpage'),
 		"data" => serialize($data)
 	);
 	$fields = "`".implode("`,`", array_keys($log_entry))."`";

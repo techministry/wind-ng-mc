@@ -23,6 +23,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{$lang.iso639}" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset={$lang.charset}" />
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 {$head}
 <link href="{$css_dir}styles.css" rel="stylesheet" type="text/css" />
 {if $site_theme == 'dark'}
@@ -38,5 +41,18 @@
 <body{foreach from=$body_tags item=item key=key} {$key}="{$item}"{/foreach}>
 <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>
 {$body}
+<script>
+// Force reload on back/forward to keep auth state correct
+window.addEventListener('pageshow', function(evt) {
+  var nav = performance && performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+  if (evt.persisted || (nav && nav.type === 'back_forward')) {
+    window.location.reload();
+  }
+});
+// Also disable bfcache on form submits by replacing history state
+if (window.history && window.history.replaceState) {
+  window.history.replaceState(null, document.title, window.location.href);
+}
+</script>
 </body>
 </html>

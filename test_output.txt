@@ -1,9 +1,0 @@
-
-
-ERROR: Call to a member function GCDistance() on null<br>File: D:\users\admin\GitHub\wind-ng-mc\includes\pages\nodes\nodes_view.php<br>Line: 57<br><pre>#0 D:\users\admin\GitHub\wind-ng-mc\includes\pages\nodes\nodes_view.php(170): nodes_view->calculate_distance(10567, 711)
-#1 D:\users\admin\GitHub\wind-ng-mc\includes\pages\nodes\nodes_view.php(345): nodes_view->table_links_p2p()
-#2 D:\users\admin\GitHub\wind-ng-mc\includes\pages\nodes\nodes.php(51): nodes_view->output()
-#3 D:\users\admin\GitHub\wind-ng-mc\includes\main_center.php(146): nodes->output()
-#4 D:\users\admin\GitHub\wind-ng-mc\includes\main.php(73): center->output()
-#5 D:\users\admin\GitHub\wind-ng-mc\index.php(36): main->output()
-#6 {main}</pre>

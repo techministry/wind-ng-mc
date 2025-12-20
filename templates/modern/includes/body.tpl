@@ -40,6 +40,12 @@
         showLoader();
       });
     });
+    // If user navigates back/forward, force a refresh so auth state is accurate
+    window.addEventListener('pageshow', function(evt) {
+      if (evt.persisted || (performance && performance.getEntriesByType('navigation')[0] && performance.getEntriesByType('navigation')[0].type === 'back_forward')) {
+        window.location.reload();
+      }
+    });
   })();
 </script>
 {/literal}

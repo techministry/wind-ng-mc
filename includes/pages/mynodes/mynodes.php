@@ -382,6 +382,17 @@ class mynodes {
 		}
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($this, 'output_onpost_'.$_POST['form_name'])) return call_user_func(array($this, 'output_onpost_'.$_POST['form_name']));
 		global $construct, $main, $db;
+		// Fetch owner username for display, even if current user cannot edit it
+		if (get('node') != 'add') {
+			$owner_row = $db->get('users.username', 'users_nodes INNER JOIN users ON users_nodes.user_id = users.id', "users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner = 'Y'");
+			$this->tpl['node_owner_display'] = isset($owner_row[0]['username']) ? $owner_row[0]['username'] : '';
+			$co_rows = $db->get('users.username', 'users_nodes INNER JOIN users ON users_nodes.user_id = users.id', "users_nodes.node_id = ".intval(get('node'))." AND users_nodes.owner != 'Y'");
+			$co_names = array();
+			foreach ((array)$co_rows as $r) {
+				if (isset($r['username'])) $co_names[] = $r['username'];
+			}
+			$this->tpl['node_coadmins_display'] = implode(', ', $co_names);
+		}
 		$this->tpl['form_node'] = $construct->form($this->form_node(), __FILE__);
 		$this->tpl['node'] = get('node');
 		if (get('action') == 'delete') {
