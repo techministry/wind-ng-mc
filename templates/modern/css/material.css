@@ -12,14 +12,34 @@
     --md-text-secondary: #757575;
     --md-border: #e0e0e0;
     --md-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --md-bg-image: url("../images/backgrounds/wind-tower.jpg");
+    --md-bg-overlay: linear-gradient(140deg, rgba(6, 24, 58, 0.88) 0%, rgba(12, 66, 132, 0.58) 45%, rgba(255, 214, 200, 0.35) 100%);
+    --md-bg-image-fade: linear-gradient(rgba(245, 245, 245, 0.35), rgba(245, 245, 245, 0.35));
+    --md-surface-90: rgba(255, 255, 255, 0.9);
 }
 
 html, body {
-    background: var(--md-bg);
+    min-height: 100%;
     color: var(--md-text-primary);
     font-family: 'Roboto', Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
+}
+
+body {
+    background-color: var(--md-bg);
+    background-image: var(--md-bg-overlay), var(--md-bg-image-fade), var(--md-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+@media (max-width: 900px) {
+    body {
+        background-attachment: scroll;
+        background-position: center top;
+    }
 }
 
 /* Responsive container */
@@ -42,7 +62,7 @@ html, body {
 table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--md-surface);
+    background: var(--md-surface-80);
     box-shadow: var(--md-shadow);
     border-radius: 8px;
     overflow: hidden;
@@ -52,7 +72,7 @@ th, td {
     border-bottom: 1px solid var(--md-border);
     text-align: left;
     color: var(--md-text-primary);
-    background: var(--md-surface);
+    background: var(--md-surface-90);
 }
 th {
     background: var(--md-primary);
@@ -63,7 +83,7 @@ th {
 .mdc-data-table__table td,
 .mdc-data-table__cell {
     color: var(--md-text-primary) !important;
-    background: var(--md-surface) !important;
+    background: var(--md-surface-90) !important;
 }
 .mdc-data-table__table tr:nth-child(even) td {
     background: #f6f8ff !important;
@@ -83,7 +103,7 @@ tr:last-child td {
     width: 100%;
     overflow-x: auto;
     border-radius: 8px;
-    background: var(--md-surface);
+    background: var(--md-surface-90);
 }
 
 .table-wrapper table {
