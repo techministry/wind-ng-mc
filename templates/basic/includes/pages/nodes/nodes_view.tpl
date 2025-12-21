@@ -109,6 +109,7 @@
 					<input type="checkbox" name="p2p" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_orange.png" alt=$lang.backbone}{$lang.backbone}
 					<input type="checkbox" name="aps" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_green.png" alt=$lang.aps}{$lang.aps}
 					<input type="checkbox" name="clients" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_blue.png" alt=$lang.clients}{$lang.clients}
+					<input type="checkbox" name="vpn" checked="checked" onclick="gmap_refresh();" /><span style="display:inline-block;width:16px;border-top:2px dotted #000;margin:0 4px 2px 2px;vertical-align:middle;"></span>{$lang.vpn|default:'VPN'}
 					<input type="checkbox" name="unlinked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_red.png" alt=$lang.unlinked}{$lang.unlinked}
 				</td>
 			</tr>

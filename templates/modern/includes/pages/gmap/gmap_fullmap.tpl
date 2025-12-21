@@ -4,6 +4,7 @@
     <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="p2p" checked onclick="gmap_refresh()"> {$lang.backbone|default:'Backbone'}</label>
     <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="aps" checked onclick="gmap_refresh()"> {$lang.aps|default:'APs'}</label>
     <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="clients" checked onclick="gmap_refresh()"> {$lang.clients|default:'Clients'}</label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="vpn" checked onclick="gmap_refresh()"> <span style="display:inline-block;width:18px;border-top:2px dotted #000;"></span> {$lang.vpn|default:'VPN'}</label>
     <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="unlinked" onclick="gmap_refresh()"> {$lang.unlinked|default:'Unlinked'}</label>
     {if $community_sources|@count gt 0}
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-left:1px solid rgba(0,0,0,0.08);padding-left:10px;">

@@ -11,6 +11,7 @@
       <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="p2p" checked onclick="gmap_refresh()"> {$lang.backbone|default:'Backbone'}</label>
       <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="aps" checked onclick="gmap_refresh()"> {$lang.aps|default:'APs'}</label>
       <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="clients" checked onclick="gmap_refresh()"> {$lang.clients|default:'Clients'}</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="vpn" checked onclick="gmap_refresh()"> <span style="display:inline-block;width:18px;border-top:2px dotted #000;"></span> {$lang.vpn|default:'VPN'}</label>
       <label style="display:flex;align-items:center;gap:6px;font-size:14px;"><input type="checkbox" name="unlinked" checked onclick="gmap_refresh()"> {$lang.unlinked|default:'Unlinked'}</label>
     </div>
     {if $gmap_key_ok}

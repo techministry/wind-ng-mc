@@ -52,7 +52,8 @@ class gmap_xml_proxy {
 			'show_clients',
 			'show_unlinked',
 			'show_links_p2p',
-			'show_links_client'
+			'show_links_client',
+			'show_links_vpn'
 		);
 		$params = array();
 		foreach ($allowed as $key) {

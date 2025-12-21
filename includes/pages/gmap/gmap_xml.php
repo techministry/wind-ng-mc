@@ -54,6 +54,7 @@ class gmap_xml {
 		$where = '';
 		$nodes = array();
 		$links = array();
+		$links_vpn = array();
 		
 		if (get('node') != '') $having .= ($having!=''?' OR ':'')."id = ".intval(get('node'));
 		if (get('show_p2p') == 1) $having .= ($having!=''?' OR ':'').'total_p2p > 0';
@@ -125,9 +126,29 @@ class gmap_xml {
 			"LEFT JOIN nodes AS n_clients ON clients.node_id = n_clients.id",
 			($where!=''?'('.$where.')':'')." HAVING n1_lat IS NOT NULL AND n1_lon IS NOT NULL AND n2_lat IS NOT NULL AND n2_lon IS NOT NULL"
 			);
+		if (get('show_links_vpn') == 1) {
+			$links_vpn = $db->get(
+				'l1.id AS id, n1.latitude AS n1_lat, n1.longitude AS n1_lon, n2.latitude AS n2_lat, n2.longitude AS n2_lon, l1.status AS l1_status, IFNULL(vpn_peer.status, l1.status) AS l2_status',
+				'links AS l1 ' .
+				"LEFT JOIN links AS vpn_peer ON (l1.type = 'p2p' AND vpn_peer.type = 'p2p' AND l1.protocol = 'VPN' AND vpn_peer.protocol = 'VPN' AND l1.node_id = vpn_peer.peer_node_id AND vpn_peer.node_id = l1.peer_node_id) " .
+				"LEFT JOIN nodes AS n1 ON l1.node_id = n1.id " .
+				"LEFT JOIN nodes AS n2 ON l1.peer_node_id = n2.id",
+				"l1.type = 'p2p' AND l1.protocol = 'VPN' AND (vpn_peer.id IS NULL OR l1.id < vpn_peer.id) HAVING n1_lat IS NOT NULL AND n1_lon IS NOT NULL AND n2_lat IS NOT NULL AND n2_lon IS NOT NULL"
+			);
+		}
 		$xml .= "<links>\r";
 		foreach ((array) $links as $key => $value) {
 			$xml .= "<link_".$value['type'];
+			$xml .= ' id="'.$value['id'].'"';
+			$xml .= ' lat1="'.$value['n1_lat'].'"';
+			$xml .= ' lon1="'.$value['n1_lon'].'"';
+			$xml .= ' lat2="'.$value['n2_lat'].'"';
+			$xml .= ' lon2="'.$value['n2_lon'].'"';
+			$xml .= ' status="'.($value['l1_status']!='active' || $value['l2_status']!='active'?'inactive':'active').'"';
+			$xml .= " />\r";
+		}
+		foreach ((array) $links_vpn as $key => $value) {
+			$xml .= "<link_vpn";
 			$xml .= ' id="'.$value['id'].'"';
 			$xml .= ' lat1="'.$value['n1_lat'].'"';
 			$xml .= ' lon1="'.$value['n1_lon'].'"';

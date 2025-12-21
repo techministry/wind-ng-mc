@@ -58,6 +58,11 @@
               {$lang.clients}
             </label>
             <label style="display:flex;align-items:center;gap:6px;color:var(--md-text-primary);font-weight:500;">
+              <input type="checkbox" name="vpn" checked="checked" onclick="gmap_refresh();" />
+              <span style="display:inline-block;width:18px;border-top:2px dotted #000;"></span>
+              {$lang.vpn|default:'VPN'}
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;color:var(--md-text-primary);font-weight:500;">
               <input type="checkbox" name="unlinked" onclick="gmap_refresh();" />
               {html_image file="`$img_dir`gmap/mm_20_red.png" alt=$lang.unlinked}
               {$lang.unlinked}

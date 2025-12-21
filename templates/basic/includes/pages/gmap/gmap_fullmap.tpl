@@ -32,6 +32,7 @@
 <input type="checkbox" name="aps" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_green.png" alt=$lang.aps}{$lang.aps}
 <input type="checkbox" name="hs" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_green.png" alt=$lang.hs}{$lang.hs}
 <input type="checkbox" name="clients" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_blue.png" alt=$lang.clients}{$lang.clients}
+<input type="checkbox" name="vpn" checked="checked" onclick="gmap_refresh();" /><span style="display:inline-block;width:16px;border-top:2px dotted #000;margin:0 4px 2px 2px;vertical-align:middle;"></span>{$lang.vpn|default:'VPN'}
 <input type="checkbox" name="unlinked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_red.png" alt=$lang.unlinked}{$lang.unlinked}
 {if $community_sources|@count gt 0}
 <div style="margin-top:6px; display:inline-flex; flex-wrap:wrap; gap:10px; align-items:center;">

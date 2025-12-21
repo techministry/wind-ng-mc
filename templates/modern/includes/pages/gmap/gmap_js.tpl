@@ -12,6 +12,7 @@ var clients = Array();
 var unlinked = Array();
 var links_p2p = Array();
 var links_client = Array();
+var links_vpn = Array();
 var markers = {};
 var polylines = {};
 var markerClusterGroup;
@@ -19,6 +20,7 @@ var ch_p2p;
 var ch_aps;
 var ch_clients;
 var ch_unlinked;
+var ch_vpn;
 var gmapInitialized = false;
 
 var communitySources = {/literal}{$community_sources_json|default:'[]'|escape:'none'}{literal};
@@ -36,7 +38,7 @@ function getCommunitySource(id) {
 function buildCommunityXmlUrl(source) {
 	if (!source || !source.xml) return "";
 	var joiner = (source.xml.indexOf("?") === -1 ? "?" : (source.xml.slice(-1) === "?" ? "" : "&"));
-	return source.xml + joiner + "show_p2p=1&show_aps=1&show_clients=1&show_unlinked=1&show_links_p2p=1&show_links_client=1";
+	return source.xml + joiner + "show_p2p=1&show_aps=1&show_clients=1&show_unlinked=1&show_links_p2p=1&show_links_client=1&show_links_vpn=1";
 }
 
 function normalizeNodeUrl(base, url) {
@@ -77,7 +79,8 @@ function parseCommunityXml(source, xmlDoc) {
 		},
 		links: {
 			p2p: tagWithCommunity(root.getElementsByTagName("link_p2p"), source),
-			client: tagWithCommunity(root.getElementsByTagName("link_client"), source)
+			client: tagWithCommunity(root.getElementsByTagName("link_client"), source),
+			vpn: tagWithCommunity(root.getElementsByTagName("link_vpn"), source)
 		}
 	};
 }
@@ -102,6 +105,7 @@ function rebuildVisibleData(enabledIds) {
 	unlinked = [];
 	links_p2p = [];
 	links_client = [];
+	links_vpn = [];
 
 	for (var i = 0; i < enabledIds.length; i++) {
 		var data = communityDataCache[enabledIds[i]];
@@ -114,6 +118,7 @@ function rebuildVisibleData(enabledIds) {
 		unlinked = unlinked.concat(data.nodes.unlinked || []);
 		links_p2p = links_p2p.concat(data.links.p2p || []);
 		links_client = links_client.concat(data.links.client || []);
+		links_vpn = links_vpn.concat(data.links.vpn || []);
 	}
 }
 
@@ -208,6 +213,7 @@ function gmap_onload() {
 	ch_aps = document.getElementsByName("aps")[0];
 	ch_clients = document.getElementsByName("clients")[0];
 	ch_unlinked = document.getElementsByName("unlinked")[0];
+	ch_vpn = document.getElementsByName("vpn")[0];
 
 	var communityToggles = document.querySelectorAll("[data-community-id]");
 	for (var i = 0; i < communityToggles.length; i++) {
@@ -297,6 +303,7 @@ function gmap_reload() {
 	reset_markers();
 	if (ch_aps.checked == true && ch_clients.checked == true) makePolylines(links_client, "#00ffff", "#ff0000", 2);
 	if (ch_p2p.checked == true) makePolylines(links_p2p, "#00ff00", "#ff0000", 3);
+	if (ch_vpn && ch_vpn.checked == true) makePolylines(links_vpn, "#000000", "#000000", 2, "4,6");
 	if (ch_unlinked.checked == true) makeMarkers(unlinked, icon_red, 100);
 	if (ch_clients.checked == true) makeMarkers(clients, icon_blue, 100);
 	if (ch_aps.checked == true) makeMarkers(aps, icon_green, 10);
@@ -335,7 +342,7 @@ function gmap_refresh() {
 	}
 }
 
-function makePolylines(links, color_active, color_inactive, size) {
+function makePolylines(links, color_active, color_inactive, size, dashArray) {
 	var bounds = map.getBounds();
 	for (var i = 0; i < links.length; i++) {
 		var link_id = links[i].getAttribute("id");
@@ -349,17 +356,19 @@ function makePolylines(links, color_active, color_inactive, size) {
 		var l_inbound_1 = bounds.contains(L.latLng(link_lat1, link_lon1));
 		var l_inbound_2 = bounds.contains(L.latLng(link_lat2, link_lon2));
 
-		if (l_inbound_1 || l_inbound_2) {
-			var color = (links[i].getAttribute("status") == 'active') ? color_active : color_inactive;
-			var point1 = [link_lat1, link_lon1];
-			var point2 = [link_lat2, link_lon2];
-			var polyline = L.polyline([point1, point2], {
-				color: color,
-				weight: size
-			});
-			polylines[poly_id] = polyline;
-			map.addLayer(polyline);
-		}
+	if (l_inbound_1 || l_inbound_2) {
+		var color = (links[i].getAttribute("status") == 'active') ? color_active : color_inactive;
+		var point1 = [link_lat1, link_lon1];
+		var point2 = [link_lat2, link_lon2];
+		var options = {
+			color: color,
+			weight: size
+		};
+		if (dashArray) options.dashArray = dashArray;
+		var polyline = L.polyline([point1, point2], options);
+		polylines[poly_id] = polyline;
+		map.addLayer(polyline);
+	}
 	}
 }
 
