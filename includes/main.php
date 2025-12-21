@@ -57,7 +57,7 @@ class main {
 	}
 	
 	function output() {
-		global $lang;
+		global $lang, $vars;
 		
 		if (get('session_lang') != '') $_SESSION['lang'] = get('session_lang');
 		language_set(isset($this->userdata->info['language'])?$this->userdata->info['language']:null);
@@ -74,7 +74,32 @@ class main {
 		$this->html->body->tpl['menu'] = $this->menu->output();
 		$this->html->body->tpl['header'] = $this->header->output();
 		$this->html->body->tpl['footer'] = $this->footer->output();
-		if ($this->message->show) $this->html->body->tpl['message'] = $this->message->output();
+		if ($this->message->show) {
+			$this->html->body->tpl['message'] = $this->message->output();
+			$this->html->body->tpl['message_type'] = $this->message->type;
+			$this->html->body->tpl['message_key'] = $this->message->key;
+		}
+		if (!isset($this->html->body->tpl['languages']) || !is_array($this->html->body->tpl['languages'])) {
+			foreach ($vars['language']['enabled'] as $key => $value) {
+				if ($value) {
+					$this->html->body->tpl['languages'][$key]['name'] = ($lang['languages'][$key]==''?$key:$lang['languages'][$key]);
+					$this->html->body->tpl['languages'][$key]['link'] = makelink(array("session_lang" => $key), TRUE);
+				}
+			}
+		}
+		$current_language = '';
+		if (get('lang') != '') {
+			$current_language = get('lang');
+		} elseif (get('session_lang') != '') {
+			$current_language = get('session_lang');
+		} elseif (isset($_SESSION['lang']) && $_SESSION['lang'] != '') {
+			$current_language = $_SESSION['lang'];
+		} elseif (isset($this->userdata->info['language']) && $this->userdata->info['language'] != '') {
+			$current_language = $this->userdata->info['language'];
+		} else {
+			$current_language = $vars['language']['default'];
+		}
+		$this->html->body->tpl['current_language'] = $current_language;
 		
 		return $this->html->output();
 	}

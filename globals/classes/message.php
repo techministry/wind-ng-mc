@@ -27,17 +27,25 @@ class message {
 	var $image;
 	var $forward;
 	var $forward_sec;
+	var $type;
+	var $key;
 	var $template='constructors/message.tpl';
 	var $tpl;
 	
 	function __construct() {
 		$this->show = FALSE;
 		$this->tpl = array();
+		$this->type = '';
+		$this->key = '';
 	}
 
 	function set_fromlang($type, $message, $forward="", $image="", $hide_menu="", $override=FALSE) {
 		global $lang;
-		$this->set($lang['message'][$type][$message]['title'], $lang['message'][$type][$message]['body'], $forward, $image, $hide_menu, $override);
+		$did_set = $this->set($lang['message'][$type][$message]['title'], $lang['message'][$type][$message]['body'], $forward, $image, $hide_menu, $override);
+		if ($did_set) {
+			$this->type = $type;
+			$this->key = $message;
+		}
 	}
 	
 	function set($title, $message, $forward="", $image="", $hide_menu="", $override=FALSE) {
@@ -49,6 +57,7 @@ class message {
 		if ($forward != '') $this->forward = $forward;
 		if ($image != '') $this->image = $image;
 		if ($hide_menu !== "") $main->menu->hide = $hide_menu;
+		return TRUE;
 	}
 	
 	function output() {

@@ -21,6 +21,13 @@
 {include assign="help" file="generic/help.tpl" help="mynodes_dnsnameserver_`$nameserver_method`"}
 {assign var=t value="nameserver_`$nameserver_method`"}
 {include file="generic/page-title.tpl" title="`$lang.$t`" right="$help"}
+{assign var=back_link value="?page=mynodes"}
+{if $smarty.get.node|default:'' != ''}
+{assign var=back_link value="?page=mynodes&node=`$smarty.get.node`"}
+{/if}
+<div style="margin:12px 0;">
+  <button type="button" class="button" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '{$back_link|escape:'javascript'}'; }">Back</button>
+</div>
 <table width="100%"  border="0" cellpadding="0" cellspacing="0" class="table-page">
 <tr>
 <td class="table-page-pad">

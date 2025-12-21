@@ -312,6 +312,94 @@ class nodes_view {
 		$table_services->db_data_translate('nodes_services__status');
 		return $table_services;
 	}
+
+	private function actionlog_table_exists() {
+		global $db;
+		$rows = $db->query_data("SHOW TABLES LIKE 'actionlog'");
+		return !empty($rows);
+	}
+
+	private function format_actionlog_data($raw) {
+		global $lang;
+		$raw = is_string($raw) ? $raw : '';
+		$raw = trim($raw);
+		if ($raw === '') return '';
+		$decoded = @unserialize($raw);
+		if ($decoded === false && $raw !== 'b:0;') {
+			return htmlspecialchars($raw, ENT_COMPAT, $lang['charset']);
+		}
+		$text = '';
+		if (is_array($decoded)) {
+			$parts = array();
+			foreach ($decoded as $item) {
+				if (is_array($item)) {
+					$flat = array();
+					foreach ($item as $value) {
+						if (is_scalar($value)) $flat[] = $value;
+					}
+					if (!empty($flat)) $parts[] = implode(', ', $flat);
+				} elseif (is_scalar($item)) {
+					$parts[] = $item;
+				}
+			}
+			$text = implode(' | ', $parts);
+		} else {
+			$text = (string)$decoded;
+		}
+		return htmlspecialchars($text, ENT_COMPAT, $lang['charset']);
+	}
+
+	private function actionlog_like_serialized($value) {
+		$value = (string)$value;
+		return 'actionlog.data LIKE \'%s:' . strlen($value) . ':"' . $value . '";%\'';
+	}
+
+	function table_logs($node_id) {
+		global $db;
+		$table_logs = new table(array('TABLE_NAME' => 'table_logs'));
+		$node_id = intval($node_id);
+		if ($node_id <= 0) return $table_logs;
+		if (!$this->actionlog_table_exists()) return $table_logs;
+
+		$tokens = array(
+			'node#'.$node_id,
+			'#ip_ranges_node#'.$node_id,
+			'#dns_zones_node#'.$node_id,
+			'#dns_nameservers_node#'.$node_id,
+			'#links_node#'.$node_id,
+			'#links_ap_node#'.$node_id,
+			'#subnets_node#'.$node_id,
+			'#ip_adrresses_node#'.$node_id,
+			'#nodes_services_node#'.$node_id,
+			'#photos_node#'.$node_id
+		);
+		// Match exact serialized tokens to avoid partial node id matches.
+		$like_parts = array();
+		foreach ($tokens as $token) {
+			$like_parts[] = $this->actionlog_like_serialized($token);
+		}
+		$where = '(' . implode(' OR ', $like_parts) . ')';
+
+		$table_logs->db_data(
+			'actionlog.id, actionlog.dateline AS actionlog__date, users.username AS users__username, actionlog.page AS actionlog__page, actionlog.action AS actionlog__action, actionlog.data AS actionlog__data',
+			'actionlog LEFT JOIN users ON actionlog.uid = users.id',
+			$where,
+			'',
+			'actionlog.id DESC',
+			'0, 100'
+		);
+
+		foreach ((array)$table_logs->data as $key => $value) {
+			if ($key == 0) continue;
+			$table_logs->data[$key]['actionlog__data'] = $this->format_actionlog_data($table_logs->data[$key]['actionlog__data']);
+			if ($table_logs->data[$key]['users__username'] === null || $table_logs->data[$key]['users__username'] === '') {
+				$table_logs->data[$key]['users__username'] = '-';
+			}
+		}
+
+		$table_logs->db_data_remove('id');
+		return $table_logs;
+	}
 	
 	function output() {
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($this, 'output_onpost_'.$_POST['form_name'])) return call_user_func(array($this, 'output_onpost_'.$_POST['form_name']));
@@ -352,6 +440,9 @@ class nodes_view {
 		#@#<
 		$this->tpl['table_ipaddr_subnets'] = $construct->table($this->table_ipaddr_subnets(), __FILE__);
 		$this->tpl['table_services'] = $construct->table($this->table_services(), __FILE__);
+		if ($this->tpl['logged']) {
+			$this->tpl['table_logs'] = $construct->table($this->table_logs(get('node')), __FILE__);
+		}
 		$t = $db->get('id, date_in, view_point, info', 'photos', "node_id = ".intval(get('node')));
 		foreach( (array) $t as $key => $value) {
 			$this->tpl['photosview'][$value['view_point']] = $value;

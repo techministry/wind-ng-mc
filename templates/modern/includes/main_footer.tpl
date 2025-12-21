@@ -11,6 +11,16 @@
     </select>
   </div>
   {/if}
+  {if isset($languages) && $languages|@count > 1}
+  <div style="display:flex;align-items:center;gap:6px;">
+    <label for="langSwitcher" style="font-size:0.9rem;color:var(--md-text-secondary);">{$lang.db.users__language|default:'Language'}:</label>
+    <select id="langSwitcher" style="padding:6px 10px;border:1px solid var(--md-border);border-radius:6px;background:#fff;color:var(--md-text-primary);">
+      {foreach from=$languages key=lang_key item=lang_item}
+        <option value="{$lang_key}"{if isset($current_language) && $lang_key == $current_language} selected{/if}>{$lang_item.name|escape}</option>
+      {/foreach}
+    </select>
+  </div>
+  {/if}
 </footer>
 {if $available_themes|@count > 1}
 {literal}
@@ -21,6 +31,24 @@
     sel.addEventListener('change', function() {
       var params = new URLSearchParams(window.location.search);
       params.set('theme', sel.value);
+      window.location.search = params.toString();
+    });
+  })();
+</script>
+{/literal}
+{/if}
+{if isset($languages) && $languages|@count > 1}
+{literal}
+<script>
+  (function() {
+    var sel = document.getElementById('langSwitcher');
+    if (!sel) return;
+    sel.addEventListener('change', function() {
+      var value = sel.value;
+      if (!value) return;
+      var params = new URLSearchParams(window.location.search);
+      params.delete('lang');
+      params.set('session_lang', value);
       window.location.search = params.toString();
     });
   })();

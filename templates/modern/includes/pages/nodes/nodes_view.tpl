@@ -2,19 +2,19 @@
 <div class="card elevation-2" style="margin-bottom:24px;">
   <h2 style="color:var(--md-primary);font-family:'Roboto',Arial,sans-serif;font-weight:500;">{$lang.node} {$node.name} (#{$node.id})</h2>
   <nav style="margin-bottom:16px;">
-    <ul style="display:flex;gap:12px;list-style:none;padding:0;margin:0;flex-wrap:wrap;">
-      <li><a href="#tab_generic" class="button material-icons">info</a></li>
-      <li><a href="#tab_links" class="button material-icons">link</a></li>
-      <li><a href="#tab_mynetwork" class="button material-icons">network_wifi</a></li>
-      <li><a href="#tab_service" class="button material-icons">miscellaneous_services</a></li>
-      <li><a href="#tab_view" class="button material-icons">visibility</a></li>
-      <li><a href="#tab_Logs" class="button material-icons">history</a></li>
+    <ul style="display:flex;gap:12px;list-style:none;padding:0;margin:0;flex-wrap:wrap;" role="tablist">
+      <li><a href="#tab_generic" class="button material-icons tab-link">info</a></li>
+      <li><a href="#tab_links" class="button material-icons tab-link">link</a></li>
+      <li><a href="#tab_mynetwork" class="button material-icons tab-link">network_wifi</a></li>
+      <li><a href="#tab_service" class="button material-icons tab-link">miscellaneous_services</a></li>
+      <li><a href="#tab_view" class="button material-icons tab-link">visibility</a></li>
+      <li><a href="#tab_Logs" class="button material-icons tab-link">history</a></li>
       {if $is_admin}
       <li><a href="/forum" class="button material-icons">admin_panel_settings</a></li>
       {/if}
     </ul>
   </nav>
-  <div id="tab_generic">
+  <div id="tab_generic" class="tab-panel">
     {include file="includes/pages/nodes/node_info.tpl"}
     <div style="margin:16px 0;">
       {if $edit_node}
@@ -24,10 +24,6 @@
     <div class="card elevation-1" style="margin-bottom:16px;">
       <h3 style="color:var(--md-primary);font-size:1.1rem;font-weight:500;margin:0 0 8px 0;">{$lang.db.nodes__info}</h3>
       <div style="color:var(--md-text-secondary);white-space:pre-line;">{$node.info|escape|nl2br}</div>
-    </div>
-
-    <div style="text-align:center;margin:24px 0;">
-      <a href="#" onclick="window.open('{$link_plot_link}','popup_plot_link','width=600,height=420,toolbar=0,resizable=1,scrollbars=1');return false;" class="button material-icons">alt_route</a>
     </div>
 
     {if $gmap_key_ok!=="nomap"}
@@ -74,6 +70,10 @@
       </div>
     {/if}
 
+    <div style="text-align:center;margin:24px 0;">
+      <a href="#" onclick="window.open('{$link_plot_link}','popup_plot_link','width=600,height=420,toolbar=0,resizable=1,scrollbars=1');return false;" class="button material-icons">alt_route</a>
+    </div>
+
     {if $logged==TRUE}
       <div class="card elevation-1" style="margin-bottom:16px;">
         <h4 style="color:var(--md-primary);font-size:1rem;font-weight:500;margin:0 0 8px 0;">{$lang.ip_ranges}</h4>
@@ -98,6 +98,41 @@
   </div>
 </div>
 
-<div id="tab_view" class="card elevation-2" style="margin-bottom:24px;">
+<div id="tab_links" class="card elevation-2 tab-panel" style="margin-bottom:24px;">
+  {foreach from=$table_links_ap item=ap}
+    {assign var=aps value="`$aps``$ap`"}
+  {/foreach}
+  {if $logged==TRUE}
+    {include file="generic/title2.tpl" title=$lang.links content="`$table_links_p2p``$aps`"}
+  {else}
+    <div style="padding:16px;color:var(--md-text-secondary);">{$lang.adpl}</div>
+  {/if}
+</div>
+
+<div id="tab_mynetwork" class="card elevation-2 tab-panel" style="margin-bottom:24px;">
+  {if $logged==TRUE}
+    {include file="generic/title2.tpl" title=$lang.mynetwork content=$table_ipaddr_subnets}
+  {else}
+    <div style="padding:16px;color:var(--md-text-secondary);">{$lang.adpl}</div>
+  {/if}
+</div>
+
+<div id="tab_service" class="card elevation-2 tab-panel" style="margin-bottom:24px;">
+  {if $logged==TRUE}
+    {include file="generic/title2.tpl" title=$lang.services content=$table_services}
+  {else}
+    <div style="padding:16px;color:var(--md-text-secondary);">{$lang.adpl}</div>
+  {/if}
+</div>
+
+<div id="tab_view" class="card elevation-2 tab-panel" style="margin-bottom:24px;">
   {include file="includes/pages/nodes/myview.tpl"}
+</div>
+
+<div id="tab_Logs" class="card elevation-2 tab-panel" style="margin-bottom:24px;">
+  {if $logged==TRUE}
+    {include file="generic/title2.tpl" title="Logs" content=$table_logs|default:"No logs available"}
+  {else}
+    <div style="padding:16px;color:var(--md-text-secondary);">{$lang.adpl}</div>
+  {/if}
 </div>

@@ -47,7 +47,7 @@ class hostmaster_range {
 			ip_ranges.id = '".get("iprange")."'"; #'".intval(get('node_id'))."'";
 			$query = $db->query($q);
 			$data = mysql_fetch_assoc($query);
-			$this_node_com_admins = explode(",",$data[admins]);
+			$this_node_com_admins = explode(",", $data['admins']);
 			#echo $q ;print_r($query); echo "<br>"; print_r($data); print_r($this_node_com_admins);
 					 if (!in_array($main->userdata->user,$this_node_com_admins))
 						{

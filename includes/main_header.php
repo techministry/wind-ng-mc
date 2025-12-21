@@ -58,6 +58,7 @@ class header {
 		if (!$this->tpl['logged']) {
 			$form_login = $main->menu->form_login();
 			$this->tpl['form_login'] = $construct->form($form_login, 'constructors/form.tpl');
+			$main->html->body->tpl['form_login'] = $this->tpl['form_login'];
 		}
 		
 		// Use template() to render the header template

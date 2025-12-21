@@ -161,6 +161,38 @@ tr:last-child td {
     background: var(--md-primary-dark);
 }
 
+.tabs-ready .tab-panel {
+    display: none;
+}
+
+.tabs-ready .tab-panel.is-active {
+    display: block;
+}
+
+.tab-link.is-active {
+    background: var(--md-primary-dark);
+    box-shadow: 0 3px 8px rgba(17, 82, 147, 0.35);
+}
+
+.login-launch {
+    margin-bottom: 24px;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 24px;
+    text-align: center;
+}
+
+.login-launch__button {
+    min-width: 180px;
+}
+
+.login-message-action {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}
+
 /* Input style */
 input, select, textarea {
     font-family: inherit;
@@ -206,6 +238,54 @@ input:focus, select:focus, textarea:focus {
     border: 4px solid var(--md-border);
     border-top-color: var(--md-primary);
     animation: spin 0.9s linear infinite;
+}
+
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(13, 71, 161, 0.75), rgba(25, 118, 210, 0.55));
+    z-index: 10000;
+    padding: 16px;
+    backdrop-filter: blur(2px);
+}
+
+.login-overlay.is-visible {
+    display: flex;
+}
+
+.login-overlay__panel {
+    width: 100%;
+    max-width: 480px;
+    background: var(--md-surface);
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+    padding: 20px 24px;
+}
+
+.login-overlay__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.login-overlay__close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--md-text-secondary);
+    padding: 6px;
+}
+
+.login-overlay__close:hover {
+    color: var(--md-text-primary);
+}
+
+body.login-overlay-open {
+    overflow: hidden;
 }
 
 @keyframes spin {

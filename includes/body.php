@@ -53,6 +53,7 @@ class body {
 		$smarty->assign('logged', isset($this->tpl['logged']) ? $this->tpl['logged'] : false);
 		$smarty->assign('form_login', isset($this->tpl['form_login']) ? $this->tpl['form_login'] : '');
 		$smarty->assign('languages', isset($this->tpl['languages']) ? $this->tpl['languages'] : array());
+		$smarty->assign('current_language', isset($this->tpl['current_language']) ? $this->tpl['current_language'] : '');
 		$smarty->assign('logged_username', isset($this->tpl['logged_username']) ? $this->tpl['logged_username'] : '');
 		$smarty->assign('link_logged_profile', isset($this->tpl['link_logged_profile']) ? $this->tpl['link_logged_profile'] : '');
 		

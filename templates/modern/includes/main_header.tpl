@@ -1,9 +1,9 @@
 {* WiND Modern Material Theme Header *}
 <header class="card elevation-2" style="display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap;">
-  <div style="display:flex;align-items:center;gap:12px;">
+  <a href="?page=startup" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
     <img src="templates/modern/images/main_logo.png" alt="WiND Logo" style="height:48px;">
     <span style="font-size:2rem;font-weight:500;color:var(--md-primary);font-family:'Roboto',Arial,sans-serif;">WiND</span>
-  </div>
+  </a>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
     <nav style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
       <a href="?page=nodes" class="button material-icons" title="Nodes">dns</a>
@@ -14,6 +14,11 @@
         <a href="?page=admin&subpage=nodes" class="button material-icons" title="Admin Nodes">device_hub</a>
         <a href="?page=admin&subpage=services" class="button material-icons" title="Admin Services">build</a>
         <a href="?page=admin&subpage=site" class="button material-icons" title="Site Config">admin_panel_settings</a>
+      {else}
+        <button type="button" class="button" data-login-open>
+          <span class="material-icons" aria-hidden="true" style="font-size:20px;vertical-align:middle;margin-right:6px;">login</span>
+          {$lang.log_in}
+        </button>
       {/if}
     </nav>
     {if $logged}

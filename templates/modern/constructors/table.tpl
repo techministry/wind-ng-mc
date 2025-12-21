@@ -16,9 +16,31 @@
     </tr>
   {else}
     <tr class="mdc-data-table__row" style="background:{cycle values='#f8f9fb,#ffffff'};">
+      {assign var=edit_column value=""}
+      {assign var=edit value=""}
+      {assign var=onclick value=""}
+      {if ($extra_data.EDIT_COLUMN|default:'') != ''}
+        {assign var=edit_column value="`$extra_data.EDIT_COLUMN`"}
+        {assign var=edit value="`$extra_data.EDIT[row]`"}
+      {/if}
+      {if ($extra_data.PICKUP_COLUMN|default:'') != ''}
+        {assign var=edit_column value="`$extra_data.PICKUP_COLUMN`"}
+        {assign var=edit value=""}
+        {assign var=onclick value="javascript: window.opener.pickup(window.opener.document.`$extra_data.PICKUP_OBJECT`,'`$extra_data.PICKUP_OUTPUT[row]`','`$extra_data.PICKUP_VALUE[row]`', window); return false;"|stripslashes}
+      {/if}
       {foreach key=key item=itm from=$data[row]}
         {assign var="fullkey" value=$data.0.$key}
-        <td class="mdc-data-table__cell" style="padding:12px 14px;">{$itm}</td>
+        <td class="mdc-data-table__cell" style="padding:12px 14px;">
+          {if $key==$edit_column && $smarty.section.row.index != 0}
+            <a href="{$edit}"{if ($extra_data.PICKUP_COLUMN|default:'') != ''} onclick="{$onclick}"{/if}>
+          {/if}
+          {if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}
+            <a href="{$extra_data.LINK.$fullkey[row]}">
+          {/if}
+          {$itm}
+          {if $key==$edit_column && $smarty.section.row.index != 0}</a>{/if}
+          {if isset($extra_data.LINK.$fullkey) && $extra_data.LINK.$fullkey[row] != ''}</a>{/if}
+        </td>
       {/foreach}
     </tr>
   {/if}
