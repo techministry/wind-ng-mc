@@ -70,6 +70,11 @@
   {assign var=row_num value=$row_num+1}
 {/foreach}
 </table>
+  <div style="text-align:left; margin-bottom:8px; color:#1976d2; font-size:0.85rem;">
+    <span>Χρησιμοποιήστε τα ίδια στοιχεία σύνδεσης με το <b>wna.gr</b>.</span><br>
+    <span>Please use the same credentials as <b>wna.gr</b>.</span>
+  </div>
+</div>
 <div style="margin-top:12px;text-align:right;">
   <button type="submit" class="button">{$extra_data.SUBMIT_LABEL|default:$lang.submit}</button>
 </div>
