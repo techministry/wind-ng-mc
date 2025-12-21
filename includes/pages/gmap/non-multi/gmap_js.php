@@ -23,62 +23,12 @@ class gmap_js {
 	
 	var $tpl;
 
-	private function community_sources($link_xml_page) {
-		global $db;
-
-		$sources = array(
-			array(
-				'id' => 'local',
-				'name' => (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '' ? $_SERVER['HTTP_HOST'] : 'Local'),
-				'xml' => $link_xml_page,
-				'base' => '',
-				'default_enabled' => TRUE
-			)
-		);
-
-		$rows = $db->get('id, name, windURL', 'communities', "windURL IS NOT NULL AND windURL <> ''", '', 'name ASC');
-		foreach ((array)$rows as $row) {
-			$wind_url = trim($row['windURL']);
-			if ($wind_url === '') continue;
-			if (preg_match('#^https?://#i', $wind_url)) {
-				$wind_url = preg_replace('#^http://#i', 'https://', $wind_url);
-			} else {
-				$wind_url = 'https://'.$wind_url;
-			}
-			$clean_base = rtrim($wind_url, '/');
-			$proxy_xml = makelink(array(
-				"page" => "gmap",
-				"subpage" => "xml_proxy",
-				"community" => intval($row['id'])
-			), FALSE, FALSE, FALSE);
-			$sources[] = array(
-				'id' => 'community-'.$row['id'],
-				'name' => $row['name'],
-				'xml' => $proxy_xml,
-				'base' => $clean_base,
-				'default_enabled' => FALSE
-			);
-		}
-
-		return $sources;
-	}
-
 	function __construct() {
 		
 	}
 	
 	function output() {
 		global $db, $lang, $vars;
-
-		// Ensure only JS is sent back (avoid PHP warnings breaking the script)
-		while (ob_get_level()) {
-			ob_end_clean();
-		}
-		error_reporting(0);
-		if (!headers_sent()) {
-			header("Content-Type: application/javascript; charset=utf-8");
-			header("Cache-Control: no-cache, must-revalidate");
-		}
 		
 		if (get('node') != '') {
 			$node = $db->get('latitude, longitude', 'nodes', "id = ".intval(get('node')));
@@ -122,7 +72,6 @@ class gmap_js {
 		}
 		$this->tpl['link_xml_page'] = makelink(array("page" => "gmap", "subpage" => "xml", "node" => get('node')), FALSE, TRUE, FALSE);
 		$this->tpl['maps_available'] = $vars['gmap']['maps_available'];
-		$this->tpl['community_sources_json'] = json_encode($this->community_sources($this->tpl['link_xml_page']));
 		
 		echo template($this->tpl, __FILE__);
 		exit;

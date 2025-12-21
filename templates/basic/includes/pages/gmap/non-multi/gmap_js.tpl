@@ -1,6 +1,23 @@
 {*
- * WiND Modern Theme - Leaflet Map JS
- * Copy of basic gmap_js.tpl for compatibility
+ * WiND - Wireless Nodes Database
+ * Basic HTML Template
+ *
+ * Copyright (C) 2005 Nikolaos Nikalexis <winner@cube.gr>
+ * Copyright (C) 2012 Ioannis Haralampides <wavesoft@wna.gr>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 dated June, 1991.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  *}
 {literal}
 var map;
@@ -19,140 +36,6 @@ var ch_p2p;
 var ch_aps;
 var ch_clients;
 var ch_unlinked;
-var gmapInitialized = false;
-
-var communitySources = {/literal}{$community_sources_json|default:'[]'|escape:'none'}{literal};
-var communityDataCache = {};
-var communityLoading = {};
-var communityCheckboxes = {};
-
-function getCommunitySource(id) {
-	for (var i = 0; i < communitySources.length; i++) {
-		if (communitySources[i].id === id) return communitySources[i];
-	}
-	return null;
-}
-
-function buildCommunityXmlUrl(source) {
-	if (!source || !source.xml) return "";
-	var joiner = (source.xml.indexOf("?") === -1 ? "?" : (source.xml.slice(-1) === "?" ? "" : "&"));
-	return source.xml + joiner + "show_p2p=1&show_aps=1&show_clients=1&show_unlinked=1&show_links_p2p=1&show_links_client=1";
-}
-
-function normalizeNodeUrl(base, url) {
-	if (!url) return url;
-	if (url.indexOf("http://") === 0 || url.indexOf("https://") === 0) return url;
-	if (!base) return url;
-	var cleanBase = base.replace(/\/+$/, "");
-	var cleanUrl = url.replace(/^\/+/, "");
-	return cleanBase + "/" + cleanUrl;
-}
-
-function tagWithCommunity(list, source) {
-	var results = [];
-	for (var i = 0; i < list.length; i++) {
-		var node = list[i];
-		node.setAttribute("community_key", source.id);
-		if (source.name && !node.getAttribute("community")) node.setAttribute("community", source.name);
-		if (source.base) {
-			var nodeUrl = node.getAttribute("url");
-			if (nodeUrl) node.setAttribute("url", normalizeNodeUrl(source.base, nodeUrl));
-		}
-		results.push(node);
-	}
-	return results;
-}
-
-function parseCommunityXml(source, xmlDoc) {
-	var root = (xmlDoc && xmlDoc.documentElement ? xmlDoc.documentElement : null);
-	if (!root) return null;
-	return {
-		nodes: {
-			selected: tagWithCommunity(root.getElementsByTagName("selected"), source),
-			p2p_ap: tagWithCommunity(root.getElementsByTagName("p2p-ap"), source),
-			ap: tagWithCommunity(root.getElementsByTagName("ap"), source),
-			p2p: tagWithCommunity(root.getElementsByTagName("p2p"), source),
-			client: tagWithCommunity(root.getElementsByTagName("client"), source),
-			unlinked: tagWithCommunity(root.getElementsByTagName("unlinked"), source)
-		},
-		links: {
-			p2p: tagWithCommunity(root.getElementsByTagName("link_p2p"), source),
-			client: tagWithCommunity(root.getElementsByTagName("link_client"), source)
-		}
-	};
-}
-
-function getEnabledCommunityIds() {
-	var enabled = [];
-	for (var i = 0; i < communitySources.length; i++) {
-		var source = communitySources[i];
-		var checkbox = communityCheckboxes[source.id];
-		var isChecked = (checkbox ? checkbox.checked : !!source.default_enabled);
-		if (isChecked) enabled.push(source.id);
-	}
-	return enabled;
-}
-
-function rebuildVisibleData(enabledIds) {
-	selected = [];
-	p2p_ap = [];
-	p2p = [];
-	aps = [];
-	clients = [];
-	unlinked = [];
-	links_p2p = [];
-	links_client = [];
-
-	for (var i = 0; i < enabledIds.length; i++) {
-		var data = communityDataCache[enabledIds[i]];
-		if (!data) continue;
-		selected = selected.concat(data.nodes.selected || []);
-		p2p_ap = p2p_ap.concat(data.nodes.p2p_ap || []);
-		aps = aps.concat(data.nodes.ap || []);
-		p2p = p2p.concat(data.nodes.p2p || []);
-		clients = clients.concat(data.nodes.client || []);
-		unlinked = unlinked.concat(data.nodes.unlinked || []);
-		links_p2p = links_p2p.concat(data.links.p2p || []);
-		links_client = links_client.concat(data.links.client || []);
-	}
-}
-
-function fetchCommunityXml(source, callback) {
-	if (!source || !source.id) { callback(null); return; }
-	if (communityDataCache[source.id]) { callback(communityDataCache[source.id]); return; }
-	if (!communityLoading[source.id]) communityLoading[source.id] = [];
-	communityLoading[source.id].push(callback);
-	if (communityLoading[source.id].length > 1) return;
-
-	var xml_url = buildCommunityXmlUrl(source);
-	var request = new XMLHttpRequest();
-	request.open("GET", xml_url, true);
-	request.onreadystatechange = function() {
-		if (request.readyState == 4) {
-			var data = null;
-			var xmlDoc = request.responseXML;
-			if (!xmlDoc || !xmlDoc.documentElement) {
-				try {
-					var parser = new DOMParser();
-					xmlDoc = parser.parseFromString(request.responseText || "", "text/xml");
-				} catch (e) {}
-			}
-			if (xmlDoc && xmlDoc.documentElement) {
-				data = parseCommunityXml(source, xmlDoc);
-			}
-			if (data) communityDataCache[source.id] = data;
-			var callbacks = communityLoading[source.id] || [];
-			communityLoading[source.id] = [];
-			for (var i = 0; i < callbacks.length; i++) callbacks[i](data);
-		}
-	};
-	request.onerror = function() {
-		var callbacks = communityLoading[source.id] || [];
-		communityLoading[source.id] = [];
-		for (var i = 0; i < callbacks.length; i++) callbacks[i](null);
-	};
-	request.send(null);
-}
 
 {/literal}
 
@@ -202,26 +85,15 @@ var icon_green = iconStack[0],
     icon_grey = iconStack[4];
 
 function gmap_onload() {
-	if (gmapInitialized) return;
-	gmapInitialized = true;
 	ch_p2p = document.getElementsByName("p2p")[0];
 	ch_aps = document.getElementsByName("aps")[0];
 	ch_clients = document.getElementsByName("clients")[0];
 	ch_unlinked = document.getElementsByName("unlinked")[0];
-
-	var communityToggles = document.querySelectorAll("[data-community-id]");
-	for (var i = 0; i < communityToggles.length; i++) {
-		var cid = communityToggles[i].getAttribute("data-community-id");
-		if (cid) communityCheckboxes[cid] = communityToggles[i];
-	}
 	
 	// Initialize Leaflet map
 	map = L.map('map', {
 		zoomControl: true,
-		scrollWheelZoom: true,
-		zoomDelta: 1,
-		wheelPxPerZoomLevel: 120,
-		wheelDebounceTime: 120
+		scrollWheelZoom: true
 	});
 	
 	// Add tile layers
@@ -307,41 +179,90 @@ function gmap_reload() {
 
 function gmap_refresh() {
 	reset_markers();
-	markerClusterGroup.clearLayers();
-
-	var enabledCommunities = getEnabledCommunityIds();
-	if (enabledCommunities.length === 0) {
-		rebuildVisibleData([]);
-		gmap_reload();
-		return;
+	var ch_p2p = document.getElementsByName("p2p")[0];
+	var ch_aps = document.getElementsByName("aps")[0];
+	var ch_clients = document.getElementsByName("clients")[0];
+	var ch_unlinked = document.getElementsByName("unlinked")[0];
+	if (((ch_p2p.checked == true && p2p.length > 0) || ch_p2p.checked == false) &&
+		((ch_aps.checked == true && aps.length > 0) || ch_aps.checked == false) &&
+		((ch_clients.checked == true && clients.length > 0) || ch_clients.checked == false) &&
+		((ch_unlinked.checked == true && unlinked.length > 0) || ch_unlinked.checked == false)) {
+			markerClusterGroup.clearLayers();
+			markers = {};
+			for (var pid in polylines) {
+				if (polylines[pid]) map.removeLayer(polylines[pid]);
+			}
+			polylines = {};
+			gmap_reload();
+			return;
 	}
-
-	var pending = enabledCommunities.length;
-	var onComplete = function() {
-		pending--;
-		if (pending <= 0) {
-			rebuildVisibleData(enabledCommunities);
+	
+	// Use modern XMLHttpRequest
+	var request = new XMLHttpRequest();
+	var xml_url = "{/literal}{$link_xml_page}{literal}" +
+		(ch_p2p.checked == true && p2p.length == 0?"&show_p2p=1":"") +
+		(ch_aps.checked == true && aps.length == 0?"&show_aps=1":"") +
+		(ch_clients.checked == true && clients.length == 0?"&show_clients=1":"") +
+		(ch_unlinked.checked == true && unlinked.length == 0?"&show_unlinked=1":"") +
+		(ch_p2p.checked == true && links_p2p.length == 0?"&show_links_p2p=1":"") +
+		(ch_aps.checked == true && ch_clients.checked == true && links_client.length == 0?"&show_links_client=1":"");
+	console.log("Fetching XML from:", xml_url);
+	request.open("GET", xml_url, true);
+	request.onreadystatechange = function() {
+		if (request.readyState == 4) {
+			console.log("XML response status:", request.status);
+			console.log("XML response type:", request.getResponseHeader("Content-Type"));
+			var xmlDoc = request.responseXML;
+			
+			// Fallback: manually parse XML if responseXML is null
+			if (!xmlDoc || !xmlDoc.documentElement) {
+				console.log("Attempting manual XML parsing...");
+				try {
+					var parser = new DOMParser();
+					xmlDoc = parser.parseFromString(request.responseText, "text/xml");
+					// Check for parse errors
+					var parseError = xmlDoc.getElementsByTagName("parsererror");
+					if (parseError.length > 0) {
+						console.error("XML parse error:", parseError[0].textContent);
+						return;
+					}
+				} catch (e) {
+					console.error("Failed to parse XML:", e);
+					return;
+				}
+			}
+			
+			if (!xmlDoc || !xmlDoc.documentElement) {
+				console.error("Failed to parse XML response. Response text:", request.responseText.substring(0, 500));
+				return;
+			}
+			console.log("XML root element:", xmlDoc.documentElement.tagName);
+			selected = xmlDoc.documentElement.getElementsByTagName("selected");
+			if ((ch_p2p.checked == true || ch_aps.checked == true) && p2p_ap.length == 0) p2p_ap = xmlDoc.documentElement.getElementsByTagName("p2p-ap");
+			if (ch_aps.checked == true && aps.length == 0) aps = xmlDoc.documentElement.getElementsByTagName("ap");
+			if (ch_p2p.checked == true && p2p.length == 0) p2p = xmlDoc.documentElement.getElementsByTagName("p2p");
+			if (ch_clients.checked == true && clients.length == 0) clients = xmlDoc.documentElement.getElementsByTagName("client");
+			if (ch_unlinked.checked == true && unlinked.length == 0) unlinked = xmlDoc.documentElement.getElementsByTagName("unlinked");
+			if (ch_p2p.checked == true && links_p2p.length == 0) links_p2p = xmlDoc.documentElement.getElementsByTagName("link_p2p");
+			if (ch_aps.checked == true && ch_clients.checked == true && links_client.length == 0) links_client = xmlDoc.documentElement.getElementsByTagName("link_client");
+			console.log("Nodes loaded - p2p:", p2p.length, "aps:", aps.length, "clients:", clients.length, "unlinked:", unlinked.length);
+			markerClusterGroup.clearLayers();
+			markers = {};
+			for (var pid in polylines) {
+				if (polylines[pid]) map.removeLayer(polylines[pid]);
+			}
+			polylines = {};
 			gmap_reload();
 		}
 	};
-
-	for (var i = 0; i < enabledCommunities.length; i++) {
-		var source = getCommunitySource(enabledCommunities[i]);
-		if (!source) {
-			onComplete();
-			continue;
-		}
-		fetchCommunityXml(source, onComplete);
-	}
+	request.send(null);
 }
 
 function makePolylines(links, color_active, color_inactive, size) {
 	var bounds = map.getBounds();
 	for (var i = 0; i < links.length; i++) {
 		var link_id = links[i].getAttribute("id");
-		var source_key = links[i].getAttribute("community_key") || "local";
-		var poly_id = source_key + ":" + link_id;
-		if (polylines[poly_id] != undefined) continue;
+		if (polylines[link_id] != undefined) continue;
 		var link_lat1 = parseFloat(links[i].getAttribute("lat1"));
 		var link_lon1 = parseFloat(links[i].getAttribute("lon1"));
 		var link_lat2 = parseFloat(links[i].getAttribute("lat2"));
@@ -357,7 +278,7 @@ function makePolylines(links, color_active, color_inactive, size) {
 				color: color,
 				weight: size
 			});
-			polylines[poly_id] = polyline;
+			polylines[link_id] = polyline;
 			map.addLayer(polyline);
 		}
 	}
@@ -380,7 +301,6 @@ function reset_markers() {
 		}
 	}
 	markers = {};
-	polylines = {};
 }
 
 function getNumberedIconURL(number) {
@@ -406,14 +326,11 @@ function makeMarkers(nodes, icon_image, icon_zoom) {
 		var node_name = nodes[i].getAttribute("name");
 		var node_community = nodes[i].getAttribute("community") || "Not set";
 		var node_id = nodes[i].getAttribute("id");
-		var node_source = nodes[i].getAttribute("community_key") || "local";
-		var node_lat = parseFloat(nodes[i].getAttribute("lat"));
-		var node_lon = parseFloat(nodes[i].getAttribute("lon"));
+		var node_lat = nodes[i].getAttribute("lat");
+		var node_lon = nodes[i].getAttribute("lon");
 		var node_url = nodes[i].getAttribute("url");
 
-		var markerId = node_source + ":" + node_id;
-		if (markers[markerId] != undefined) continue;
-		if (!isFinite(node_lat) || !isFinite(node_lon)) continue;
+		if (markers[node_id] != undefined) continue;
 
 		var point = L.latLng(node_lat, node_lon);
 		var inbounds = bounds.contains(point);
@@ -453,18 +370,12 @@ function makeMarkers(nodes, icon_image, icon_zoom) {
 			}
 			
 			var marker = createMarker(point, html, icon);
-			markers[markerId] = marker;
+			markers[node_id] = marker;
 			markerClusterGroup.addLayer(marker);
 		}
 	}
 }
 
-if (typeof window !== "undefined") {
-	if (document.readyState === "complete") {
-		gmap_onload();
-	} else {
-		window.addEventListener("load", gmap_onload);
-	}
-}
-
 {/literal}
+
+

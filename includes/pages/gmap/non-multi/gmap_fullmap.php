@@ -22,38 +22,7 @@
 class gmap_fullmap {
 
 	var $tpl;
-
-	private function community_sources() {
-		global $db;
-
-		$sources = array(
-			array(
-				'id' => 'local',
-				'name' => (isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != '' ? $_SERVER['HTTP_HOST'] : 'Local'),
-				'default_enabled' => TRUE
-			)
-		);
-
-		$rows = $db->get('id, name, windURL', 'communities', "windURL IS NOT NULL AND windURL <> ''", '', 'name ASC');
-		foreach ((array)$rows as $row) {
-			$wind_url = trim($row['windURL']);
-			if ($wind_url === '') continue;
-			if (preg_match('#^https?://#i', $wind_url)) {
-				$wind_url = preg_replace('#^http://#i', 'https://', $wind_url);
-			} else {
-				$wind_url = 'https://'.$wind_url;
-			}
-			$sources[] = array(
-				'id' => 'community-'.$row['id'],
-				'name' => $row['name'],
-				'windURL' => $wind_url,
-				'default_enabled' => FALSE
-			);
-		}
-
-		return $sources;
-	}
-
+	
 	function gmap() {
 
 	}
@@ -62,7 +31,6 @@ class gmap_fullmap {
 		global $main, $vars;
 		$main->menu->hide = true;
 		$this->tpl['gmap_key_ok'] = include_gmap("?page=gmap&subpage=js&node=".get('node'));
-		$this->tpl['community_sources'] = $this->community_sources();
 		return template($this->tpl, __FILE__);
 	}
 

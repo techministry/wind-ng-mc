@@ -21,9 +21,22 @@
 <style>
 #map { min-height: calc(100vh - 150px); }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <table class="table-main" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px; text-align:center; width: 100%;">
 {if $gmap_key_ok}
 <div id="map" style="width: 100%; height: calc(100vh - 150px);"></div>
+<script type="text/javascript">
+{literal}
+window.onload = function() {
+	var map = L.map('map').setView([38, 23], 8);
+	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; OpenStreetMap contributors'
+	}).addTo(map);
+};
+{/literal}
+</script>
 {else}
 {$lang.message.error.gmap_key_failed.body|wordwrap:40|nl2br}
 {/if}
@@ -33,16 +46,5 @@
 <input type="checkbox" name="hs" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_green.png" alt=$lang.hs}{$lang.hs}
 <input type="checkbox" name="clients" checked="checked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_blue.png" alt=$lang.clients}{$lang.clients}
 <input type="checkbox" name="unlinked" onclick="gmap_refresh();" />{html_image file="`$img_dir`/gmap/mm_20_red.png" alt=$lang.unlinked}{$lang.unlinked}
-{if $community_sources|@count gt 0}
-<div style="margin-top:6px; display:inline-flex; flex-wrap:wrap; gap:10px; align-items:center;">
-  <strong>{$lang.communities|default:'Communities'}:</strong>
-  {foreach from=$community_sources item=community}
-    <label style="white-space:nowrap;"{if $community.windURL} title="{$community.windURL|escape}"{/if}>
-      <input type="checkbox" data-community-id="{$community.id}"{if $community.default_enabled} checked="checked"{/if} onclick="gmap_refresh();" />
-      {$community.name|escape}
-    </label>
-  {/foreach}
-</div>
-{/if}
 </td></tr>
 </table>
