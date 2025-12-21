@@ -29,7 +29,34 @@ class gmap_xml_proxy {
 		} else {
 			$wind_url = 'https://'.$wind_url;
 		}
-		return $wind_url;
+
+		$parts = parse_url($wind_url);
+		if ($parts === false || !isset($parts['host'])) return rtrim($wind_url, '/');
+
+		$scheme = isset($parts['scheme']) ? $parts['scheme'] : 'https';
+		$host = $parts['host'];
+		if (isset($parts['port'])) $host .= ':' . $parts['port'];
+		$path = isset($parts['path']) ? $parts['path'] : '';
+		$path = preg_replace('#/+#', '/', $path);
+
+		if ($path !== '') {
+			if (preg_match('#^(.*?/index\\.php)(?:/.*)?$#i', $path, $matches)) {
+				$path = $matches[1];
+			} else {
+				$path = rtrim($path, '/');
+				$segments = explode('/', $path);
+				$last = end($segments);
+				$drop = array('nodes', 'map', 'gmap');
+				if ($last !== false && in_array(strtolower($last), $drop, true)) {
+					array_pop($segments);
+					$path = implode('/', $segments);
+				}
+			}
+		}
+
+		$base = $scheme.'://'.$host;
+		if ($path !== '') $base .= '/'.ltrim($path, '/');
+		return rtrim($base, '/');
 	}
 
 	private function parse_community_id($value) {
@@ -101,6 +128,41 @@ class gmap_xml_proxy {
 		return $body;
 	}
 
+	private function looks_like_wind_xml($body) {
+		if (!is_string($body)) return false;
+		$body = trim($body);
+		if ($body === '') return false;
+		if (stripos($body, '<wind') === false) return false;
+		if (stripos($body, '<nodes') === false) return false;
+		return true;
+	}
+
+	private function build_endpoint_url($base, $page, $subpage, $params) {
+		if ($base === '') return '';
+		$base = rtrim($base, '/');
+		$query = 'page='.rawurlencode($page).'&subpage='.rawurlencode($subpage);
+		if ($params !== '') $query .= '&'.$params;
+		if (preg_match('#\\.php$#i', $base)) {
+			$separator = (strpos($base, '?') === false ? '?' : '&');
+			return $base.$separator.$query;
+		}
+		return $base.'/?'.$query;
+	}
+
+	private function fetch_wind_xml($base, $params) {
+		$endpoints = array(
+			array('page' => 'gmap', 'subpage' => 'xml'),
+			array('page' => 'map', 'subpage' => 'xml')
+		);
+		foreach ($endpoints as $endpoint) {
+			$url = $this->build_endpoint_url($base, $endpoint['page'], $endpoint['subpage'], $params);
+			if ($url === '') continue;
+			$body = $this->fetch_url($url);
+			if ($this->looks_like_wind_xml($body)) return $body;
+		}
+		return false;
+	}
+
 	private function output_empty_xml($charset) {
 		return "<?xml version='1.0' encoding='".$charset."' standalone='yes'?>\n<wind></wind>";
 	}
@@ -136,16 +198,12 @@ class gmap_xml_proxy {
 		$clean_base = rtrim($wind_url, '/');
 		$params = $this->build_param_query();
 
-		$remote_url = $clean_base.'/?page=gmap&subpage=xml';
-		if ($params !== '') $remote_url .= '&'.$params;
-		$body = $this->fetch_url($remote_url);
+		$body = $this->fetch_wind_xml($clean_base, $params);
 
 		if ($body === false) {
 			$fallback_base = preg_replace('#^https://#i', 'http://', $clean_base);
 			if ($fallback_base !== $clean_base) {
-				$fallback_url = $fallback_base.'/?page=gmap&subpage=xml';
-				if ($params !== '') $fallback_url .= '&'.$params;
-				$body = $this->fetch_url($fallback_url);
+				$body = $this->fetch_wind_xml($fallback_base, $params);
 			}
 		}
 

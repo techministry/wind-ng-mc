@@ -64,6 +64,19 @@ function normalizeNodeUrl(base, url) {
 	if (!base) return url;
 	var cleanBase = base.replace(/\/+$/, "");
 	var cleanUrl = url.replace(/^\/+/, "");
+	var joiner = "/";
+	if (cleanUrl.charAt(0) === "?" || cleanUrl.charAt(0) === "#") {
+		joiner = "";
+	}
+	if (/\.(php)$/i.test(cleanBase)) {
+		if (/^index\.php/i.test(cleanUrl)) {
+			cleanUrl = cleanUrl.replace(/^index\.php\/?/i, "");
+			if (cleanUrl === "" || cleanUrl.charAt(0) === "?" || cleanUrl.charAt(0) === "#") {
+				joiner = "";
+			}
+		}
+		return cleanBase + joiner + cleanUrl;
+	}
 	return cleanBase + "/" + cleanUrl;
 }
 
@@ -432,7 +445,7 @@ function makeMarkers(nodes, icon_image, icon_zoom) {
 		var node_source = nodes[i].getAttribute("community_key") || "local";
 		var node_lat = parseFloat(nodes[i].getAttribute("lat"));
 		var node_lon = parseFloat(nodes[i].getAttribute("lon"));
-		var node_url = nodes[i].getAttribute("url");
+		var node_url = nodes[i].getAttribute("url") || "#";
 
 		if (markers[node_source + ":" + node_id] != undefined) continue;
 		if (!isFinite(node_lat) || !isFinite(node_lon)) continue;
@@ -441,9 +454,9 @@ function makeMarkers(nodes, icon_image, icon_zoom) {
 		var inbounds = bounds.contains(point);
 
 		if (inbounds) {
-			var node_area = nodes[i].getAttribute("area");
-			var node_freeifs = nodes[i].getAttribute("freeifs");
-			var node_adminowner = nodes[i].getAttribute("adminowner");
+			var node_area = nodes[i].getAttribute("area") || "";
+			var node_freeifs = nodes[i].getAttribute("freeifs") || "";
+			var node_adminowner = nodes[i].getAttribute("adminowner") || "";
 			var node_p2p = nodes[i].getAttribute("p2p") * 1;
 			var node_aps = nodes[i].getAttribute("aps") * 1;
 			var node_client_on_ap = nodes[i].getAttribute("client_on_ap") * 1;

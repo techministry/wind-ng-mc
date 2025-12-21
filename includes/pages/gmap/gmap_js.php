@@ -23,6 +23,44 @@ class gmap_js {
 	
 	var $tpl;
 
+	private function normalize_wind_base($wind_url) {
+		$wind_url = trim($wind_url);
+		if ($wind_url === '') return '';
+		if (preg_match('#^https?://#i', $wind_url)) {
+			$wind_url = preg_replace('#^http://#i', 'https://', $wind_url);
+		} else {
+			$wind_url = 'https://'.$wind_url;
+		}
+
+		$parts = parse_url($wind_url);
+		if ($parts === false || !isset($parts['host'])) return rtrim($wind_url, '/');
+
+		$scheme = isset($parts['scheme']) ? $parts['scheme'] : 'https';
+		$host = $parts['host'];
+		if (isset($parts['port'])) $host .= ':' . $parts['port'];
+		$path = isset($parts['path']) ? $parts['path'] : '';
+		$path = preg_replace('#/+#', '/', $path);
+
+		if ($path !== '') {
+			if (preg_match('#^(.*?/index\\.php)(?:/.*)?$#i', $path, $matches)) {
+				$path = $matches[1];
+			} else {
+				$path = rtrim($path, '/');
+				$segments = explode('/', $path);
+				$last = end($segments);
+				$drop = array('nodes', 'map', 'gmap');
+				if ($last !== false && in_array(strtolower($last), $drop, true)) {
+					array_pop($segments);
+					$path = implode('/', $segments);
+				}
+			}
+		}
+
+		$base = $scheme.'://'.$host;
+		if ($path !== '') $base .= '/'.ltrim($path, '/');
+		return rtrim($base, '/');
+	}
+
 	private function community_sources($link_xml_page) {
 		global $db;
 
@@ -38,14 +76,8 @@ class gmap_js {
 
 		$rows = $db->get('id, name, windURL', 'communities', "windURL IS NOT NULL AND windURL <> ''", '', 'name ASC');
 		foreach ((array)$rows as $row) {
-			$wind_url = trim($row['windURL']);
-			if ($wind_url === '') continue;
-			if (preg_match('#^https?://#i', $wind_url)) {
-				$wind_url = preg_replace('#^http://#i', 'https://', $wind_url);
-			} else {
-				$wind_url = 'https://'.$wind_url;
-			}
-			$clean_base = rtrim($wind_url, '/');
+			$clean_base = $this->normalize_wind_base($row['windURL']);
+			if ($clean_base === '') continue;
 			$proxy_xml = makelink(array(
 				"page" => "gmap",
 				"subpage" => "xml_proxy",
