@@ -11,3 +11,7 @@
 *.sw?
 .env
 templates/_compiled/
+techministry-theme/
+*.zip
+*.tar.gz
+logs/
