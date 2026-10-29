@@ -185,6 +185,22 @@ class userdata {
 		return $this->logged;
 	}
 
+	function login_by_id($uid) {
+		global $db;
+		$uid = intval($uid);
+		if ($uid <= 0) return FALSE;
+		cookie('userdata['.$this->primary_key.']', '');
+		cookie('userdata['.$this->password_key.']', '');
+		if (session_id() != '') session_regenerate_id(TRUE);
+		$_SESSION['userdata'] = array($this->primary_key => $uid);
+		$this->logged = TRUE;
+		$this->user = $uid;
+		$this->reset_visit();
+		$this->refresh_session();
+		$this->load_info();
+		return $this->logged;
+	}
+
 	function logout() {
 		if ($this->logged) {
 			cookie('userdata['.$this->primary_key.']', '');

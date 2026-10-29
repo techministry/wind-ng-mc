@@ -31,13 +31,122 @@ class menu {
 	function form_login() {
 		$form_login = new form(array('FORM_NAME' => 'form_login'));
 		$form_login->db_data('users.username, users.password');
+		global $vars;
+		$form_login->info['NERDID_LOGIN_URL'] = $this->nerdid_is_configured($vars['nerdid']) ? '?nerdid=login' : '';
 		return $form_login;
+	}
+
+	function nerdid_is_configured($config) {
+		return isset($config['client_id'], $config['client_secret'], $config['redirect_uri'])
+			&& $config['client_id'] !== '' && $config['client_secret'] !== '' && $config['redirect_uri'] !== '';
+	}
+
+	function handle_nerdid_auth() {
+		global $main, $db, $vars;
+		if (!isset($_GET['nerdid'])) return;
+
+		$config = $vars['nerdid'];
+		if (!$this->nerdid_is_configured($config)) {
+			http_response_code(503);
+			exit('NerdID sign-in is not configured.');
+		}
+
+		if ($_GET['nerdid'] === 'login') {
+			$random = openssl_random_pseudo_bytes(32, $strong);
+			if ($random === FALSE || !$strong) {
+				http_response_code(500);
+				exit('Unable to start NerdID sign-in.');
+			}
+			$state = bin2hex($random);
+			$verifier = bin2hex(openssl_random_pseudo_bytes(32));
+			$_SESSION['nerdid_oauth'] = array(
+				'state' => $state,
+				'verifier' => $verifier,
+				'created' => time()
+			);
+			$authorize_url = 'https://id.techministry.eu/oidc/auth?'.http_build_query(array(
+				'response_type' => 'code',
+				'client_id' => $config['client_id'],
+				'redirect_uri' => $config['redirect_uri'],
+				'scope' => 'openid profile email',
+				'state' => $state,
+				'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, TRUE)), '+/', '-_'), '='),
+				'code_challenge_method' => 'S256'
+			));
+			header('Location: '.$authorize_url);
+			exit;
+		}
+
+		if ($_GET['nerdid'] !== 'callback') {
+			http_response_code(400);
+			exit('Invalid NerdID sign-in request.');
+		}
+
+		$oauth = isset($_SESSION['nerdid_oauth']) ? $_SESSION['nerdid_oauth'] : array();
+		unset($_SESSION['nerdid_oauth']);
+		if (!isset($_GET['state'], $oauth['state'], $oauth['verifier'], $oauth['created'])
+				|| !hash_equals($oauth['state'], $_GET['state']) || time() - $oauth['created'] > 600
+				|| !isset($_GET['code']) || isset($_GET['error'])) {
+			http_response_code(400);
+			exit('NerdID sign-in failed. Please return to WiND and try again.');
+		}
+
+		$token_context = stream_context_create(array(
+			'http' => array(
+				'method' => 'POST',
+				'header' => "Authorization: Basic ".base64_encode($config['client_id'].':'.$config['client_secret'])."\r\nContent-Type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
+				'content' => http_build_query(array(
+					'grant_type' => 'authorization_code',
+					'code' => $_GET['code'],
+					'redirect_uri' => $config['redirect_uri'],
+					'code_verifier' => $oauth['verifier']
+				)),
+				'timeout' => 10,
+				'ignore_errors' => TRUE
+			),
+			'ssl' => array('verify_peer' => TRUE, 'verify_peer_name' => TRUE)
+		));
+		$token_response = @file_get_contents('https://id.techministry.eu/oidc/token', FALSE, $token_context);
+		$token = $token_response ? json_decode($token_response) : NULL;
+		if (!is_object($token) || empty($token->access_token)) {
+			http_response_code(401);
+			exit('NerdID sign-in failed. Please return to WiND and try again.');
+		}
+
+		$userinfo_context = stream_context_create(array(
+			'http' => array(
+				'method' => 'GET',
+				'header' => "Authorization: Bearer ".$token->access_token."\r\nAccept: application/json\r\n",
+				'timeout' => 10,
+				'ignore_errors' => TRUE
+			),
+			'ssl' => array('verify_peer' => TRUE, 'verify_peer_name' => TRUE)
+		));
+		$userinfo_response = @file_get_contents('https://id.techministry.eu/oidc/me', FALSE, $userinfo_context);
+		$userinfo = $userinfo_response ? json_decode($userinfo_response) : NULL;
+		$email_verified = is_object($userinfo) && isset($userinfo->email_verified)
+			&& ($userinfo->email_verified === TRUE || $userinfo->email_verified === 'true' || $userinfo->email_verified === 1);
+		if (!$email_verified || empty($userinfo->email) || empty($userinfo->sub)) {
+			http_response_code(403);
+			exit('NerdID sign-in requires a verified email address.');
+		}
+
+		$email = trim($userinfo->email);
+		$users = $db->get('id, status', 'users', "email = '".$db->escape_string($email)."'", '', '', '1');
+		if (empty($users) || $users[0]['status'] !== 'activated' || !$main->userdata->login_by_id($users[0]['id'])) {
+			http_response_code(403);
+			exit('No activated WiND account matches this verified NerdID email.');
+		}
+
+		header('Location: '.html_entity_decode(makelink(array(), FALSE, FALSE)));
+		exit;
 	}
 
 	function output() {
 		if ($this->hide) return;
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && method_exists($this, 'output_onpost_'.$_POST['form_name'])) call_user_func(array($this, 'output_onpost_'.$_POST['form_name']));
 		global $construct, $main, $db, $vars, $lang;
+		$this->handle_nerdid_auth();
 		$this->tpl['logged'] = $main->userdata->logged;
 		$this->tpl['form_login'] = $construct->form($this->form_login(), __FILE__);
 			
