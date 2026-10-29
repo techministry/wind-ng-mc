@@ -58,7 +58,12 @@ class menu {
 				exit('Unable to start NerdID sign-in.');
 			}
 			$state = bin2hex($random);
-			$verifier = bin2hex(openssl_random_pseudo_bytes(32));
+			$verifier_bytes = openssl_random_pseudo_bytes(32, $verifier_strong);
+			if ($verifier_bytes === FALSE || !$verifier_strong) {
+				http_response_code(500);
+				exit('Unable to start NerdID sign-in.');
+			}
+			$verifier = bin2hex($verifier_bytes);
 			$_SESSION['nerdid_oauth'] = array(
 				'state' => $state,
 				'verifier' => $verifier,
@@ -85,8 +90,9 @@ class menu {
 		$oauth = isset($_SESSION['nerdid_oauth']) ? $_SESSION['nerdid_oauth'] : array();
 		unset($_SESSION['nerdid_oauth']);
 		if (!isset($_GET['state'], $oauth['state'], $oauth['verifier'], $oauth['created'])
+				|| !is_string($_GET['state']) || !is_string($oauth['state'])
 				|| !hash_equals($oauth['state'], $_GET['state']) || time() - $oauth['created'] > 600
-				|| !isset($_GET['code']) || isset($_GET['error'])) {
+				|| !isset($_GET['code']) || !is_string($_GET['code']) || $_GET['code'] === '' || isset($_GET['error'])) {
 			http_response_code(400);
 			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
@@ -102,13 +108,19 @@ class menu {
 					'code_verifier' => $oauth['verifier']
 				)),
 				'timeout' => 10,
-				'ignore_errors' => TRUE
+				'ignore_errors' => TRUE,
+				'follow_location' => 0,
+				'max_redirects' => 0
 			),
 			'ssl' => array('verify_peer' => TRUE, 'verify_peer_name' => TRUE)
 		));
 		$token_response = @file_get_contents('https://id.techministry.eu/oidc/token', FALSE, $token_context);
 		$token = $token_response ? json_decode($token_response) : NULL;
-		if (!is_object($token) || empty($token->access_token)) {
+		$token_status = isset($http_response_header[0]) ? $http_response_header[0] : '';
+		if (!preg_match('/\\s200\\s/', $token_status) || !is_object($token)
+				|| !isset($token->access_token) || !is_string($token->access_token)
+				|| $token->access_token === '' || strpos($token->access_token, "\r") !== FALSE
+				|| strpos($token->access_token, "\n") !== FALSE) {
 			http_response_code(401);
 			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
@@ -118,15 +130,20 @@ class menu {
 				'method' => 'GET',
 				'header' => "Authorization: Bearer ".$token->access_token."\r\nAccept: application/json\r\n",
 				'timeout' => 10,
-				'ignore_errors' => TRUE
+				'ignore_errors' => TRUE,
+				'follow_location' => 0,
+				'max_redirects' => 0
 			),
 			'ssl' => array('verify_peer' => TRUE, 'verify_peer_name' => TRUE)
 		));
 		$userinfo_response = @file_get_contents('https://id.techministry.eu/oidc/me', FALSE, $userinfo_context);
 		$userinfo = $userinfo_response ? json_decode($userinfo_response) : NULL;
+		$userinfo_status = isset($http_response_header[0]) ? $http_response_header[0] : '';
 		$email_verified = is_object($userinfo) && isset($userinfo->email_verified)
 			&& ($userinfo->email_verified === TRUE || $userinfo->email_verified === 'true' || $userinfo->email_verified === 1);
-		if (!$email_verified || empty($userinfo->email) || empty($userinfo->sub)) {
+		if (!preg_match('/\\s200\\s/', $userinfo_status) || !$email_verified
+				|| !isset($userinfo->email, $userinfo->sub) || !is_string($userinfo->email)
+				|| !is_string($userinfo->sub) || $userinfo->email === '' || $userinfo->sub === '') {
 			http_response_code(403);
 			exit('NerdID sign-in requires a verified email address.');
 		}

@@ -79,7 +79,7 @@
   <button type="submit" class="button">{$extra_data.SUBMIT_LABEL|default:$lang.submit}</button>
 </div>
 </form>
-{if $extra_data.NERDID_LOGIN_URL != ''}
+{if isset($extra_data.NERDID_LOGIN_URL) && $extra_data.NERDID_LOGIN_URL != ''}
   <div class="nerdid-login" style="margin-top:12px;text-align:center;">
     <a class="button" href="{$extra_data.NERDID_LOGIN_URL|escape}" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
       <span class="nerdid-wordmark" aria-hidden="true">NerdID</span> Login with NerdID

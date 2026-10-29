@@ -96,6 +96,10 @@ class database {
 		return $this->query_data("SHOW FIELDS FROM `$table`");
 	}
 
+	function escape_string($value) {
+		return mysql_real_escape_string($value, $this->mysql_link);
+	}
+
 	function get($select, $from, $where="", $group_by="", $order_by="", $limit="") {
 		return $this->query_data("SELECT $select FROM $from".($where==""?"":" WHERE $where").($group_by==""?"":" GROUP BY $group_by").($order_by==""?"":" ORDER BY $order_by").($limit==""?"":" LIMIT $limit"));
 	}
