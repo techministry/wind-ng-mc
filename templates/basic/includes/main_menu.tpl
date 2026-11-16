@@ -48,7 +48,7 @@
 					<td class="table-small-menu-text"><a href="{$link_restore_password}" class="menu-link">{$lang.password_recover}</a></td>
 				</tr>*}
 				<tr bgcolor="#FFFFFF">
-					<td class="table-small-menu-text"><a href="http://www.wna.gr/forum/member.php?action=register" class="menu-link">{$lang.register}</a></td>
+					<td class="table-small-menu-text"><a href="{$link_register_signup|escape}" class="menu-link">{$lang.register}</a></td>
 				</tr>
 				<tr bgcolor="#FFFFFF">
 					<td class="table-small-menu-text"><a href="http://www.wna.gr/forum/member.php?action=lostpw" class="menu-link">{$lang.password_recover}</a></td>

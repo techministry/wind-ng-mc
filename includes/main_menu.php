@@ -330,6 +330,7 @@ class menu {
 		$this->tpl['link_alldnszones'] = makelink(array("page" => "dnszones"));
 		$this->tpl['link_restore_password'] = makelink(array("page" => "users", "action" => "restore"));
 		$this->tpl['link_register'] = makelink(array("page" => "users", "user" => "add"));
+		$this->tpl['link_register_signup'] = $this->nerdid_is_configured($vars['nerdid']) && !empty($vars['nerdid']['auto_register']) ? '?nerdid=login' : 'http://www.wna.gr/forum/member.php?action=register';
 		$this->tpl['link_logout'] = makelink(array("page" => "users", "action" => "logout", "ts" => time()));
 		parse_str(substr(makelink(array("page" => "search"), FALSE, TRUE, FALSE), 1), $this->tpl['query_string']);
 		
