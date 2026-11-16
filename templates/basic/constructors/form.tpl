@@ -77,4 +77,9 @@
 	</tr>
 </table>
 </form>
+{if isset($extra_data.NERDID_LOGIN_URL) && $extra_data.NERDID_LOGIN_URL != ''}
+<div class="nerdid-login">
+	<a href="{$extra_data.NERDID_LOGIN_URL|escape}" class="btn-login"><span class="nerdid-wordmark" aria-hidden="true">NerdID</span> Login with NerdID</a>
+</div>
+{/if}
 {if $use_pickup}<script type="text/javascript" src="{$js_dir}pickup.js"></script>{/if}
