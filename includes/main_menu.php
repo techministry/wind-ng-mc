@@ -136,6 +136,7 @@ class menu {
 				|| !is_string($_GET['state']) || !is_string($oauth['state'])
 				|| !hash_equals($oauth['state'], $_GET['state']) || time() - $oauth['created'] > 600
 				|| !isset($_GET['code']) || !is_string($_GET['code']) || $_GET['code'] === '' || isset($_GET['error'])) {
+			error_log('NerdID callback rejected: '.(empty($oauth) ? 'no saved session state (session/cookie lost between login and callback)' : (isset($_GET['error']) ? 'provider error '.(is_string($_GET['error']) ? $_GET['error'] : '') : 'state mismatch, expired or missing code')));
 			http_response_code(400);
 			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
@@ -164,6 +165,7 @@ class menu {
 				|| !isset($token->access_token) || !is_string($token->access_token)
 				|| $token->access_token === '' || strpos($token->access_token, "\r") !== FALSE
 				|| strpos($token->access_token, "\n") !== FALSE) {
+			error_log('NerdID token exchange failed: '.($token_response === FALSE ? 'request error (outbound HTTPS blocked, allow_url_fopen off, or SSL failure)' : 'status "'.$token_status.'" response '.substr($token_response, 0, 300)));
 			http_response_code(401);
 			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
@@ -209,6 +211,7 @@ class menu {
 			$db->set('users', array('status' => 'activated'), "id = '".$db->escape_string($users[0]['id'])."'");
 		}
 		if (!$main->userdata->login_by_id($users[0]['id'])) {
+			error_log('NerdID login_by_id failed for user id '.$users[0]['id']);
 			http_response_code(403);
 			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
