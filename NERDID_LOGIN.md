@@ -15,7 +15,8 @@ $config['nerdid'] = array(
     'client_id' => 'rq626afr1xsi0z56vke34',
     'client_secret' => 'YOUR_NERDID_CLIENT_SECRET',
     'redirect_uri' => 'https://your-wind-host/?nerdid=callback',
-    'auto_register' => TRUE // optional, default TRUE
+    'auto_register' => TRUE, // optional, default TRUE
+    'debug' => FALSE // optional: show the failure reason on the error page; use only while troubleshooting
 );
 ```
 
