@@ -124,6 +124,10 @@ class menu {
 				'verifier' => $verifier,
 				'created' => time()
 			);
+			// Fallback copy that survives session cookies the browser withholds on the cross-site return (e.g. SameSite=Strict)
+			$secure = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+				|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+			header('Set-Cookie: nerdid_oauth='.$state.'.'.$verifier.'.'.time().'; Max-Age=600; Path=/; HttpOnly; SameSite=Lax'.($secure ? '; Secure' : ''), FALSE);
 			$authorize_url = 'https://id.techministry.eu/oidc/auth?'.http_build_query(array(
 				'response_type' => 'code',
 				'client_id' => $config['client_id'],
@@ -144,11 +148,18 @@ class menu {
 
 		$oauth = isset($_SESSION['nerdid_oauth']) ? $_SESSION['nerdid_oauth'] : array();
 		unset($_SESSION['nerdid_oauth']);
+		$had_cookie = isset($_COOKIE['nerdid_oauth']);
+		if (empty($oauth) && $had_cookie && is_string($_COOKIE['nerdid_oauth'])
+				&& preg_match('/^([a-f0-9]{64})\.([a-f0-9]{64})\.([0-9]{9,12})$/', $_COOKIE['nerdid_oauth'], $m)) {
+			$oauth = array('state' => $m[1], 'verifier' => $m[2], 'created' => (int)$m[3]);
+		}
+		if ($had_cookie) header('Set-Cookie: nerdid_oauth=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax', FALSE);
 		if (!isset($_GET['state'], $oauth['state'], $oauth['verifier'], $oauth['created'])
 				|| !is_string($_GET['state']) || !is_string($oauth['state'])
 				|| !hash_equals($oauth['state'], $_GET['state']) || time() - $oauth['created'] > 600
 				|| !isset($_GET['code']) || !is_string($_GET['code']) || $_GET['code'] === '' || isset($_GET['error'])) {
 			$detail = 'callback rejected: '.(empty($oauth) ? 'no saved session state (session/cookie lost between login and callback)' : (isset($_GET['error']) ? 'provider error '.(is_string($_GET['error']) ? $_GET['error'] : '').' '.(isset($_GET['error_description']) && is_string($_GET['error_description']) ? $_GET['error_description'] : '') : 'state mismatch, expired or missing code'));
+			$detail .= ' | host='.(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '').' session_cookie='.(isset($_COOKIE[session_name()]) ? 'received' : 'MISSING').' nerdid_cookie='.($had_cookie ? 'received' : 'MISSING').' save_path='.session_save_path().' samesite='.ini_get('session.cookie_samesite');
 			error_log('NerdID '.$detail);
 			http_response_code(400);
 			exit('NerdID sign-in failed. Please return to WiND and try again.'.(!empty($config['debug']) ? ' ['.htmlspecialchars($detail).']' : ''));
