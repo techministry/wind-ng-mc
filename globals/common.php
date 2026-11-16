@@ -32,7 +32,7 @@ include_once(ROOT_PATH."globals/vars.php");
 include_once(ROOT_PATH."config/config.php");
 $vars = array_merge($vars, $config);
 $vars['nerdid'] = array_merge(
-	array('client_id' => 'rq626afr1xsi0z56vke34', 'client_secret' => '', 'redirect_uri' => ''),
+	array('client_id' => 'rq626afr1xsi0z56vke34', 'client_secret' => '', 'redirect_uri' => '', 'auto_register' => TRUE),
 	isset($config['nerdid']) && is_array($config['nerdid']) ? $config['nerdid'] : array()
 );
 include_once($vars['templates']['path'].$vars['templates']['default'].'/config.php');

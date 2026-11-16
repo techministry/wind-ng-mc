@@ -41,6 +41,49 @@ class menu {
 			&& $config['client_id'] !== '' && $config['client_secret'] !== '' && $config['redirect_uri'] !== '';
 	}
 
+	function nerdid_clean($value, $max) {
+		$value = is_string($value) ? preg_replace('/[\x00-\x1F\x7F\\\\\'"<>]/u', '', $value) : '';
+		return $value === NULL ? '' : trim(function_exists('mb_substr') ? mb_substr($value, 0, $max, 'UTF-8') : substr($value, 0, $max));
+	}
+
+	// Creates an activated account for a NerdID-verified email. Returns the new user id or FALSE.
+	function nerdid_register($userinfo, $email) {
+		global $db;
+		if (strlen($email) > 50 || !filter_var($email, FILTER_VALIDATE_EMAIL) || preg_match('/[\\\\\'"]/', $email)) {
+			return FALSE;
+		}
+		$base = '';
+		foreach (array('preferred_username', 'username') as $key) {
+			if (isset($userinfo->$key) && is_string($userinfo->$key)) {
+				$base = preg_replace('/[^A-Za-z0-9._-]/', '', $userinfo->$key);
+				if ($base !== '') break;
+			}
+		}
+		if ($base === '') $base = preg_replace('/[^A-Za-z0-9._-]/', '', substr($email, 0, strpos($email, '@')));
+		$base = substr($base, 0, 24);
+		if ($base === '') $base = 'user';
+
+		$username = $base;
+		for ($i = 1; $i < 1000; $i++) {
+			if (!$db->get('id', 'users', "username = '".$db->escape_string($username)."'", '', '', '1')) break;
+			$username = $base.$i;
+		}
+
+		$random = openssl_random_pseudo_bytes(32, $strong);
+		if ($random === FALSE || !$strong) return FALSE;
+
+		$ret = $db->add('users', array(
+			'username' => $username,
+			'password' => md5(bin2hex($random)),
+			'name' => $this->nerdid_clean(isset($userinfo->given_name) ? $userinfo->given_name : '', 30),
+			'surname' => $this->nerdid_clean(isset($userinfo->family_name) ? $userinfo->family_name : '', 30),
+			'email' => $email,
+			'account_code' => generate_account_code(),
+			'status' => 'activated'
+		));
+		return $ret ? $db->insert_id : FALSE;
+	}
+
 	function handle_nerdid_auth() {
 		global $main, $db, $vars;
 		if (!isset($_GET['nerdid'])) return;
@@ -150,9 +193,24 @@ class menu {
 
 		$email = trim($userinfo->email);
 		$users = $db->get('id, status', 'users', "email = '".$db->escape_string($email)."'", '', '', '1');
-		if (empty($users) || $users[0]['status'] !== 'activated' || !$main->userdata->login_by_id($users[0]['id'])) {
+		if (empty($users)) {
+			if (empty($config['auto_register'])) {
+				http_response_code(403);
+				exit('No WiND account matches this verified NerdID email.');
+			}
+			$uid = $this->nerdid_register($userinfo, $email);
+			if ($uid === FALSE) {
+				http_response_code(500);
+				exit('Unable to create a WiND account for this NerdID email.');
+			}
+			$users = array(array('id' => $uid, 'status' => 'activated'));
+		} elseif ($users[0]['status'] !== 'activated') {
+			// NerdID has verified ownership of this email, which is what activation by email link proves
+			$db->set('users', array('status' => 'activated'), "id = '".$db->escape_string($users[0]['id'])."'");
+		}
+		if (!$main->userdata->login_by_id($users[0]['id'])) {
 			http_response_code(403);
-			exit('No activated WiND account matches this verified NerdID email.');
+			exit('NerdID sign-in failed. Please return to WiND and try again.');
 		}
 
 		header('Location: '.html_entity_decode(makelink(array(), FALSE, FALSE)));
