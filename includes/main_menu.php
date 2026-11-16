@@ -95,6 +95,18 @@ class menu {
 		}
 
 		if ($_GET['nerdid'] === 'login') {
+			// The callback must reach the same host and scheme that holds the session cookie, so start there
+			$target = parse_url($config['redirect_uri']);
+			if (!isset($_GET['origin']) && is_array($target) && isset($target['scheme'], $target['host'])) {
+				$https = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
+					|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+				$current_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+				$target_host = strtolower($target['host']).(isset($target['port']) ? ':'.$target['port'] : '');
+				if ($current_host !== $target_host || (strtolower($target['scheme']) === 'https') !== $https) {
+					header('Location: '.$target['scheme'].'://'.$target_host.(isset($target['path']) ? $target['path'] : '/').'?nerdid=login&origin=1');
+					exit;
+				}
+			}
 			$random = openssl_random_pseudo_bytes(32, $strong);
 			if ($random === FALSE || !$strong) {
 				http_response_code(500);
