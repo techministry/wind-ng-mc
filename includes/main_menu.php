@@ -103,7 +103,7 @@ class menu {
 				$current_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 				$target_host = strtolower($target['host']).(isset($target['port']) ? ':'.$target['port'] : '');
 				if ($current_host !== $target_host || (strtolower($target['scheme']) === 'https') !== $https) {
-					header('Location: '.$target['scheme'].'://'.$target_host.(isset($target['path']) ? $target['path'] : '/').'?nerdid=login&origin=1');
+					header('Location: '.$target['scheme'].'://'.$target_host.(isset($target['path']) ? $target['path'] : '/').'?nerdid=login&origin=1'.(isset($_GET['screen']) && is_string($_GET['screen']) ? '&screen='.urlencode($_GET['screen']) : ''));
 					exit;
 				}
 			}
@@ -128,7 +128,7 @@ class menu {
 			$secure = (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off')
 				|| (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
 			header('Set-Cookie: nerdid_oauth='.$state.'.'.$verifier.'.'.time().'; Max-Age=600; Path=/; HttpOnly; SameSite=Lax'.($secure ? '; Secure' : ''), FALSE);
-			$authorize_url = 'https://id.techministry.eu/oidc/auth?'.http_build_query(array(
+			$authorize_params = array(
 				'response_type' => 'code',
 				'client_id' => $config['client_id'],
 				'redirect_uri' => $config['redirect_uri'],
@@ -136,7 +136,10 @@ class menu {
 				'state' => $state,
 				'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $verifier, TRUE)), '+/', '-_'), '='),
 				'code_challenge_method' => 'S256'
-			));
+			);
+			// Lets menu links open NerdID directly on its password reset screen
+			if (isset($_GET['screen']) && $_GET['screen'] === 'reset_password') $authorize_params['first_screen'] = 'reset_password';
+			$authorize_url = 'https://id.techministry.eu/oidc/auth?'.http_build_query($authorize_params);
 			header('Location: '.$authorize_url);
 			exit;
 		}
@@ -359,6 +362,7 @@ class menu {
 		$this->tpl['link_restore_password'] = makelink(array("page" => "users", "action" => "restore"));
 		$this->tpl['link_register'] = makelink(array("page" => "users", "user" => "add"));
 		$this->tpl['link_register_signup'] = $this->nerdid_is_configured($vars['nerdid']) && !empty($vars['nerdid']['auto_register']) ? '?nerdid=login' : 'http://www.wna.gr/forum/member.php?action=register';
+		$this->tpl['link_password_recover'] = $this->nerdid_is_configured($vars['nerdid']) ? '?nerdid=login&screen=reset_password' : 'http://www.wna.gr/forum/member.php?action=lostpw';
 		$this->tpl['link_logout'] = makelink(array("page" => "users", "action" => "logout", "ts" => time()));
 		parse_str(substr(makelink(array("page" => "search"), FALSE, TRUE, FALSE), 1), $this->tpl['query_string']);
 		

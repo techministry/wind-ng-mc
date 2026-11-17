@@ -1,6 +1,6 @@
 # NerdID Login Setup
 
-WiND supports NerdID authorization-code sign-in with PKCE. NerdID's email must be verified. If an existing WiND account has exactly that email, the user is signed in (a pending account is activated, since NerdID has verified the email). If none exists, an activated account is created automatically, with a username derived from NerdID's `preferred_username` (or the email prefix, made unique), the given/family names, and a random password that can be changed through the password restore page. Set `'auto_register' => FALSE` to disable creation and only allow sign-in to existing accounts.
+WiND supports NerdID authorization-code sign-in with PKCE. NerdID's email must be verified. If an existing WiND account has exactly that email, the user is signed in (a pending account is activated, since NerdID has verified the email). If none exists, an activated account is created automatically, with a username derived from NerdID's `preferred_username` (or the email prefix, made unique), the given/family names, and a random password (NerdID is the way to sign in; the menu's "Password recovery" opens NerdID's password reset screen). Set `'auto_register' => FALSE` to disable creation and only allow sign-in to existing accounts.
 
 Register an OIDC client at NerdID with this redirect URI:
 
