@@ -241,8 +241,11 @@ class menu {
 			exit('NerdID sign-in failed. Please return to WiND and try again.'.(!empty($config['debug']) ? ' [login_by_id failed]' : ''));
 		}
 
-		header('Location: '.html_entity_decode(makelink(array(), FALSE, FALSE)));
-		exit;
+		// A client-side hop makes the next request same-site, so a SameSite=Strict session cookie is sent (a 302 here would not carry it)
+		$home = html_entity_decode(makelink(array(), FALSE, FALSE));
+		header('Content-Type: text/html; charset=utf-8');
+		header('Cache-Control: no-store');
+		exit('<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url='.htmlspecialchars($home, ENT_QUOTES).'"><title>Signing in…</title></head><body><script>window.location.replace('.json_encode($home).');</script><noscript><a href="'.htmlspecialchars($home, ENT_QUOTES).'">Continue</a></noscript></body></html>');
 	}
 
 	function output() {
