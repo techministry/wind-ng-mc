@@ -82,7 +82,7 @@
 {if isset($extra_data.NERDID_LOGIN_URL) && $extra_data.NERDID_LOGIN_URL != ''}
   <div class="nerdid-login" style="margin-top:12px;text-align:center;">
     <a class="button" href="{$extra_data.NERDID_LOGIN_URL|escape}" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
-      <span class="nerdid-wordmark" aria-hidden="true">NerdID</span> Login with NerdID
+      <img src="templates/basic/images/nerdid.svg" alt="" width="18" height="18" style="border:0" /> Login with NerdID
     </a>
   </div>
 {/if}

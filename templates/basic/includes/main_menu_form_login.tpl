@@ -39,6 +39,6 @@
 </form>
 {if isset($extra_data.NERDID_LOGIN_URL) && $extra_data.NERDID_LOGIN_URL != ''}
 <div class="nerdid-login">
-	<a href="{$extra_data.NERDID_LOGIN_URL|escape}" class="btn-login"><span class="nerdid-wordmark" aria-hidden="true">NerdID</span> Login with NerdID</a>
+	<a href="{$extra_data.NERDID_LOGIN_URL|escape}" class="btn-login"><img src="templates/basic/images/nerdid.svg" alt="" width="16" height="16" style="vertical-align:middle;margin-right:6px;border:0" /> Login with NerdID</a>
 </div>
 {/if}
