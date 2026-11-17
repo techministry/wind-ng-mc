@@ -125,7 +125,7 @@ class center {
 				if (get('user') == 'add') return TRUE;
 				if ($main->userdata->logged === TRUE) {
 					if (get('action') == 'logout') return TRUE;
-					if (get('user') === $main->userdata->user) return TRUE;
+					if ((string)get('user') === (string)$main->userdata->user) return TRUE;
 				}
 				if (get('action') == 'activate') return TRUE;
 				if (get('action') == 'restore') return TRUE;
