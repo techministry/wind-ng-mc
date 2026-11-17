@@ -19,6 +19,27 @@
  *
  */
 
+// Falls back to a private writable directory when PHP's configured session path can't be written,
+// since session_start() would otherwise fail silently and no login could persist
+function wind_prepare_session_path() {
+	$path = session_save_path();
+	if (strpos($path, ';') !== FALSE) $path = substr($path, strrpos($path, ';') + 1);
+	if ($path !== '' && is_dir($path) && is_writable($path)) return;
+	$root = realpath(ROOT_PATH);
+	$candidates = array(rtrim(sys_get_temp_dir(), '/\\').'/wind_sessions', $root.'/files/sessions');
+	foreach ($candidates as $dir) {
+		if (!is_dir($dir)) @mkdir($dir, 0700, TRUE);
+		if (is_dir($dir) && is_writable($dir)) {
+			if (strpos($dir, $root) === 0 && !file_exists($dir.'/.htaccess')) {
+				@file_put_contents($dir.'/.htaccess', "Require all denied\nDeny from all\n");
+			}
+			session_save_path($dir);
+			return;
+		}
+	}
+	error_log('WiND: no writable session directory found; logins will not persist');
+}
+
 function mybb_login($username, $password_md5) {
 	global $db;
 	// Check user password
@@ -121,6 +142,7 @@ class userdata {
 	function __construct() { $this->userdata(); } // PHP 7/8 constructor wrapper
 
 	function userdata() {
+		if (session_id() === '') wind_prepare_session_path();
 		session_start();
 		if (isset($_SESSION['userdata'][$this->primary_key])) {
 			$this->logged = TRUE;
